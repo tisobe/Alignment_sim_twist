@@ -7,7 +7,7 @@
 #											#
 #	author: t. isobe (tisobe@cfa.harvard.edu)					#
 #											#
-#	last update: Nov 04, 2004							#
+#	last update: Dec 29, 2004							#
 #											#
 #########################################################################################
 
@@ -90,7 +90,7 @@ $alist = `ls -d *`;
 OUTER:
 foreach $dir (@dlist){
         if($dir =~ /param/){
-		system('rm ./param/*');
+		system('rm -rf  ./param/*');
                 last OUTER;
         }
 }
@@ -125,7 +125,7 @@ foreach $line (@date_list){
 	print OUT "detector=pcad\n";
 	print OUT "subdetector=aca\n";
 	print OUT "level=1\n";
-	print OUT "version=last\n";
+#	print OUT "version=last\n";
 	print OUT "filetype=fidprops\n";
 	print OUT "tstart=$tstart\n";
 	print OUT "tstop=$tstop\n";
@@ -142,7 +142,7 @@ foreach $line (@date_list){
 	print OUT "detector=pcad\n";
 	print OUT "subdetector=aca\n";
 	print OUT "level=1\n";
-	print OUT "version=last\n";
+#	print OUT "version=last\n";
 	print OUT "filetype=acacent\n";
 	print OUT "tstart=$tstart\n";
 	print OUT "tstop=$tstop\n";
@@ -234,7 +234,8 @@ sub extract_data{
                         	@ctemp = split(/N/, $btemp[1]);
                         	$file_id = $ctemp[0];
                         	@dtemp = split(/HRC-/, $atemp[3]);
-                        	push(@detect_chip_id, $dtemp[1]);	#---HRC name
+				$name = 'H-'."$dtemp[1]";
+                        	push(@detect_chip_id, $name);		#---HRC name
                         	@ftemp = split(/\s+/, $_);
                         	push(@detect_slot_id, $ftemp[2]);	#---Slot name
 				push(@detect_fid_id, $ftemp[4]);	#--- fid id
@@ -270,6 +271,7 @@ sub extract_data{
 		@alg    = ();
 		$cnt  = 0;
 		while(<IN>){
+			chomp $_;
 			@atemp = split(/\s+/, $_);
 			if($atemp[1] =~ /\d/ && $atemp[2] =~ /\d/){
 				push(@time,   $atemp[2]);
@@ -285,6 +287,7 @@ sub extract_data{
 		system("fdump ./Sim_twist_temp/tmp.fits ./Sim_twist_temp/zout2 ang_y,ang_z,alg - clobber=yes");
 		open(IN, './Sim_twist_temp/zout2');
 		while(<IN>){
+			chomp $_;
 			@atemp = split(/\s+/, $_);
 			if($atemp[1] =~ /\d/ && $atemp[2] =~ /\d/){
 				push(@ang_y,  $atemp[2]);
@@ -394,6 +397,7 @@ sub extract_data{
 		}
 		close(OUT);
 		$name = "/data/mta/www/mta_sim_twist/Data/$detect_chip_id[$chip_cnt]";
+###		$name = "./Data/$detect_chip_id[$chip_cnt]";
 		$chip_cnt++;
 		system("cat ./Sim_twist_temp/test_out >> $name");
 		system("rm ./Sim_twist_temp/test_out");

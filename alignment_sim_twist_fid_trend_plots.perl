@@ -8,7 +8,7 @@ use PGPLOT;
 #											#
 #	author: t. isobe (tisobe@cfa.harvard.edu)					#
 #											#
-#	last update: Nov 04, 2004							#
+#	last update: Dec 29, 2004							#
 #											#
 #########################################################################################
 
@@ -22,7 +22,7 @@ use PGPLOT;
 #
 
 @detector_list  = ('I-1','I-2','I-3','I-4','I-5','I-6','S-1','S-2','S-3','S-4','S-5','S-6',
-			'h-I-1','h-I-2','h-I-3','h-I-4','h-S-1','h-S-2','h-S-3','h-S-4');
+			'H-I-1','H-I-2','H-I-3','H-I-4','H-S-1','H-S-2','H-S-3','H-S-4');
 #@detector_list  = ('I-3');
 
 @sub_plot_cnt   = (1, 1, 1, 2, 2, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1 );
@@ -41,15 +41,15 @@ $plot_begin = 0;
 $alist = `ls -d *`;
 @dlist = split(/\s+/, $alist);
 
-#OUTER:
-#foreach $dir (@dlist){
-#        if($dir =~ /param/){
-#                system("rm ./param/*");
-#                last OUTER;
-#        }
-#}
-#system('mkdir ./param');
-#
+OUTER:
+foreach $dir (@dlist){
+        if($dir =~ /param/){
+                system("rm -rf ./param/*");
+                last OUTER;
+        }
+}
+system('mkdir ./param');
+
 OUTER:
 foreach $dir (@dlist){
         if($dir =~ /Sim_twist_temp2/){
@@ -103,8 +103,8 @@ foreach $detector (@detector_list){
 #
 #---- read data in (I-1, I-2, ....)
 #
-#	$input = '/data/mta/www/mta_sim_twist/Data/'."$detector";
-	$input = './Data/'."$detector";
+	$input = '/data/mta/www/mta_sim_twist/Data/'."$detector";
+####	$input = './Data/'."$detector";
 
 	open(FH, "$input");
 	@time   = ();
@@ -222,12 +222,12 @@ foreach $detector (@detector_list){
 	$det_cnt++;
 
 	$plot_name = "$detector".'.gif';
-#	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp2/pgplot.ps|/data/mta4/MTA/bin/pnmcrop | pnmflip -r270 |/data/mta4/MTA/bin/ppmtogif > /data/mta/www/mta_sim_twist/Plots/$plot_name");
-	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp2/pgplot.ps|./pnmcrop | pnmflip -r270 |./ppmtogif > ./Plots/$plot_name");
+	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp2/pgplot.ps|/data/mta4/MTA/bin/pnmcrop | /data/mta4/MTA/bin/pnmflip -r270 |/data/mta4/MTA/bin/ppmtogif > /data/mta/www/mta_sim_twist/Plots/$plot_name");
+####	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp2/pgplot.ps|/data/mta4/MTA/bin/pnmcrop | /data/mta4/MTA/bin/pnmflip -r270 |/data/mta4/MTA/bin/ppmtogif > ./Plots/$plot_name");
 	system("rm ./Sim_twist_temp2/pgplot.ps");
 }
 
-#system("rm -rf ./Sim_twist_temp2 ./param");
+system("rm -rf ./Sim_twist_temp2 ./param");
 
 
 ########################################################

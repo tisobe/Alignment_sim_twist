@@ -7,7 +7,7 @@ use PGPLOT;
 #											#
 #		author: t. isobe (tisobe@cfa.harvard.edu)				#
 #											#
-#		last update: Nov 01, 2004						#
+#		last update: Dec 29, 2004						#
 #											#
 #########################################################################################
 
@@ -185,6 +185,8 @@ sub extract_data{
 #
 	open(OUT,  '>> /data/mta/www/mta_sim_twist/Data/data_extracted');
 	open(OUT2, '>> /data/mta/www/mta_sim_twist/Data/data_info');
+###	open(OUT,  '>> ./Data/data_extracted');
+###	open(OUT2, '>> ./Data/data_info');
 
 	foreach $file (@list){
 
@@ -286,6 +288,7 @@ sub extract_data{
 sub plot_data{
 
 	open(FH, '/data/mta/www/mta_sim_twist/Data/data_extracted');
+###	open(FH, './Data/data_extracted');
 	@time   = ();
 	@dy     = ();
 	@dz     = ();
@@ -313,6 +316,7 @@ sub plot_data{
 
 
 	open(FH, '/data/mta/www/mta_sim_twist/Data/data_info');
+###	open(FH, './Data/data_info');
 	@date     = ();
 	@sim_x    = ();
 	@sim_y    = ();
@@ -610,6 +614,7 @@ sub plot_data{
 	pgclos();
 
 	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps | /data/mta4/MTA/bin/pnmcrop||/data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/twist_plot.gif");
+###	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps | /data/mta4/MTA/bin/pnmcrop||/data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./Plots/twist_plot.gif");
 
 	system("rm ./Sim_twist_temp/pgplot.ps");
 }
