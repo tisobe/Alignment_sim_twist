@@ -226,7 +226,8 @@ foreach $detector (@detector_list){
 	$ylin2 = $int + $slope * 1411;
 	pgmove($xmin,$ylin1);
 	pgdraw(1411, $ylin2);
-	pgptxt($xside2, $ymark_pos2, 0.0, 0.5, "Slope(dom < 1411): $slope");
+	$slope_yr = 365 * $slope;
+	pgptxt($xside2, $ymark_pos2, 0.0, 0.5, "Slope(dom < 1411): $slope_yr");
 
 	$tot = 	$icnt2;
 	@xtemp = @timei2;
@@ -238,7 +239,8 @@ foreach $detector (@detector_list){
 	pgmove(1411,$ylin1);
 	pgdraw($xmax, $ylin2);
 	$ymark_pos3 = $ymax - 0.2 * ($ymax - $ymin);
-	pgptxt($xside2, $ymark_pos3, 0.0, 0.5, "Slope(dom > 1411): $slope");
+	$slope_yr = 365 * $slope;
+	pgptxt($xside2, $ymark_pos3, 0.0, 0.5, "Slope(dom > 1411): $slope_yr");
 
 	$ymark_pos4 = $ymark_pos2 - 0.1 * $ydiff;
 
@@ -289,7 +291,8 @@ foreach $detector (@detector_list){
 	pgmove($xmin, $ylin1);
 	pgdraw($xmax, $ylin2);
 
-	pgptxt($xside2, $ymark_pos2, 0.0, 0.5, "Slope: $slope");
+	$slope_yr = 365 * $slope;
+	pgptxt($xside2, $ymark_pos2, 0.0, 0.5, "Slope: $slope_yr");
 
 	pgsci(4);
 	pgmove(1411, $ymin);
