@@ -8,7 +8,7 @@ use PGPLOT;
 #											#
 #	author: t. isobe (tisobe@cfa.harvard.edu)					#
 #											#
-#	last update: Dec 29, 2004							#
+#	last update: Jan 31, 2005							#
 #											#
 #########################################################################################
 
@@ -23,15 +23,14 @@ use PGPLOT;
 
 @detector_list  = ('I-1','I-2','I-3','I-4','I-5','I-6','S-1','S-2','S-3','S-4','S-5','S-6',
 			'H-I-1','H-I-2','H-I-3','H-I-4','H-S-1','H-S-2','H-S-3','H-S-4');
-#@detector_list  = ('I-3');
+#@detector_list  = ('S-2');
 
 @sub_plot_cnt   = (1, 1, 1, 2, 2, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1 );
-@sub_plot_cent1 = (-163.5, -165.0, -189.0, 188.0,  217.0, 346.5, -343.5, -344.5, -369.0,  40.0,  37.5, 167.0,
+@sub_plot_cent1 = (-163.5, -165.0, -189.0, 219.0,  217.0, 346.5, -343.5, -344.5, -369.0,  40.0,  37.5, 167.0,
 		   -257.0, -257.0,  206.0, 206.5,  -88.0, -86.0,  118.5,  119.0);
-@sub_plot_cent2 = (-999,   -999,    -999,  219.0,  -999,  -999,  -999,   -999,   -999,    28.0,  26.5, -999,
-		   -999,   -999,   -999,  -999,   -999,   -999, -999,    -999);
+@sub_plot_cent2 = (-181.5,  158.3,  -5.0 ,-427.3,  371.4,  -73.5,  -183.0,  158,   -6,      -427.3,  370.0, -75,
+		   158.6,  -164.6,   245.5,  -250.5,   238.8,   -242.5, 239.7,  -241.8 );
 
-$interval = 6;
 $plot_begin = 0;
 
 #
@@ -84,6 +83,12 @@ if($year > 2012){
 $dom_today = $uyday + $add;
 
 #
+#--- increase a y plotting range slightly as time passes
+#
+
+$interval = 4 + 0.5 * ($year - 2005);
+
+#
 #---- start plottings
 #
 
@@ -107,13 +112,19 @@ foreach $detector (@detector_list){
 ####	$input = './Data/'."$detector";
 
 	open(FH, "$input");
-	@time   = ();
-	@fid    = ();
-	@acenti = ();
-	@acentj = ();
-	@fa     = ();
-	@tsc    = ();
-	$cnt    = 0 ;
+	@time    = ();
+	@timei1  = ();
+	@timei2  = ();
+	@fid     = ();
+	@acenti  = ();
+	@acenti1 = ();
+	@acenti2 = ();
+	@acentj  = ();
+	@fa      = ();
+	@tsc     = ();
+	$cnt     = 0 ;
+	$icnt1   = 0 ;
+	$icnt2   = 0 ;
 
 	while(<FH>){
 		chomp $_;
@@ -121,7 +132,7 @@ foreach $detector (@detector_list){
 		$dom = $atemp[0]/86400 - 567;
 		push(@time,   $dom);
 		push(@fid,    $atemp[2]);
-#		push(@acenti, $atemp[4]);
+		push(@acenti, $atemp[4]);
 		push(@acentj, $atemp[5]);
 		push(@fa,     $atemp[8]);
 		push(@tsc,    $atemp[9]);
@@ -146,41 +157,59 @@ foreach $detector (@detector_list){
 		%{fid_color.$fid[$i]} = (color =>["$fid_no1"]);
 	}
 		
-	for($i = 0; $i < $sub_plot_cnt[$det_cnt]; $i++){
-		$i1 = $i + 1;
-		$line = 'sub_plot_cent'."$i1";
-		$app_mean = ${$line}[$det_cnt];
-		$bot      = $app_mean - 0.5 * $interval;
-		$top      = $app_mean + 0.5 * $interval;
-		$mean = 0; 
-		$mcnt = 0;
-		foreach $ent (@acentj){
-			if($ent >= $bot && $ent < $top){
-				$mean += $ent;
-				$mcnt++;
-			}
+#
+#---- limit plotting range
+#
+
+#
+#--- plot acent i data
+#
+	$i1 = 2;
+	$line = 'sub_plot_cent'."$i1";
+	$app_mean = ${$line}[$det_cnt];
+	$bot      = $app_mean - 3.0 * $interval;
+	$top      = $app_mean + 3.0 * $interval;
+	
+	$mean = 0; 
+	$mcnt = 0;
+	foreach $ent (@acenti){
+		if($ent >= $bot && $ent < $top){
+			$mean += $ent;
+			$mcnt++;
 		}
-		if($mcnt > 0){
-			${mean.$i} = $mean/$mcnt;
-		}else{
-			${mean.$i} = $app_mean;
-		}
+	}
+	if($mcnt > 0){
+		$mean = $mean/$mcnt;
+	}else{
+		$mean = $app_mean;
 	}
 
 	@xbin = @time;
-	@ybin = @acentj;
+	@ybin = @acenti;
 	$total = $cnt;
 
 	pgbegin(0, '"./Sim_twist_temp2/pgplot.ps"/cps',1,1);
 	pgsch(1);
 	pgslw(3);
 
-	@temp = sort{$a<=>$b} @acentj;
-	$ymin = $temp[0];
-	$ymax = $temp[$cnt -1];
-	$ydiff = $ymax - $ymin;
-	$ymin -= 0.05 * $ydiff;
-	$ymax += 0.05 * $ydiff;
+	$ymin = $mean - 0.4 * $interval; 
+	$ymax = $mean + 0.6 * $interval; 
+
+#
+#---- different tracks before dom = 1411 and after
+#
+
+	for($k = 0; $k < $cnt; $k++){
+		if($time[$k] < 1411){
+			push(@timei1, $time[$k]);
+			push(@acenti1, $acenti[$k]);
+			$icnt1++;
+		}else{
+			push(@timei2, $time[$k]);
+			push(@acenti2, $acenti[$k]);
+			$icnt2++;
+		}
+	}
 
 	pgsvp(0.1, 0.9, 0.7, 0.98);
 	pgswin($xmin, $xmax, $ymin, $ymax);
@@ -188,33 +217,85 @@ foreach $detector (@detector_list){
 
 	plot_fig();
 
-#	pgptxt($xside,$ymid, 90.0, 0.5, "ACENT J");
-
-
-	for($l = 0; $l < $sub_plot_cnt[$det_cnt]; $l++){
-		$ymin = ${mean.$l} - 0.5 * $interval; 
-		$ymax = ${mean.$l} + 0.5 * $interval; 
-		$y1 = 0.4  - 0.3 * $l;
-		$y2 = 0.68 - 0.3 * $l;
-		pgsvp(0.1, 0.9, $y1, $y2);
-		pgswin($xmin, $xmax, $ymin, $ymax);
-		if($l < $sub_plot_cnt[$det_cnt] -1){
-			pgbox(ABCST,0.0, 0.0, ABCNSTV, 0.0, 0.0);
-		}else{
-			pgbox(ABCNST,0.0, 0.0, ABCNSTV, 0.0, 0.0);
-		}
+	$tot = 	$icnt1;
+	@xtemp = @timei1;
+	@ytemp = @acenti1;
+	least_fit();
 	
-		plot_fig();
+	$ylin1 = $int + $slope * $xmin;
+	$ylin2 = $int + $slope * 1411;
+	pgmove($xmin,$ylin1);
+	pgdraw(1411, $ylin2);
+	pgptxt($xside2, $ymark_pos2, 0.0, 0.5, "Slope(dom < 1411): $slope");
 
-		$ylin1 = $int + $slope * $xmin;
-		$ylin2 = $int + $slope * $xmax;
-		pgmove($xmin,$ylin1);
-		pgdraw($xmax, $ylin2);
+	$tot = 	$icnt2;
+	@xtemp = @timei2;
+	@ytemp = @acenti2;
+	least_fit();
+	
+	$ylin1 = $int + $slope * 1411;
+	$ylin2 = $int + $slope * $xmax;
+	pgmove(1411,$ylin1);
+	pgdraw($xmax, $ylin2);
+	$ymark_pos3 = $ymax - 0.2 * ($ymax - $ymin);
+	pgptxt($xside2, $ymark_pos3, 0.0, 0.5, "Slope(dom > 1411): $slope");
 
-		pgptxt($xside2, $ymark_pos2, 0.0, 0.5, "Slope: $slope");
-		$ymark_pos4 = $ymark_pos2 - 0.1 * $ydiff;
-		pgptxt($xside2, $ymark_pos4, 0.0, 0.5, "TSC Avg: $tsc_avg +/- $sig");
+	$ymark_pos4 = $ymark_pos2 - 0.1 * $ydiff;
+
+	pgsci(4);
+	pgmove(1411, $ymin);
+	pgdraw(1411, $ymax);
+	pgsci(1);
+
+#
+#---- plot acent j data
+#
+
+	$i1 = 1;
+	$line = 'sub_plot_cent'."$i1";
+	$app_mean = ${$line}[$det_cnt];
+	$bot      = $app_mean - 3.0 * $interval;
+	$top      = $app_mean + 3.0 * $interval;
+	$mean = 0; 
+	$mcnt = 0;
+	foreach $ent (@acentj){
+		if($ent >= $bot && $ent < $top){
+			$mean += $ent;
+			$mcnt++;
+		}
 	}
+	if($mcnt > 0){
+		$mean = $mean/$mcnt;
+	}else{
+		$mean = $app_mean;
+		$mcnt = $cnt;
+	}
+
+	@xbin = @time;
+	@ybin = @acentj;
+	$total = $cnt;
+
+	$ymin = $mean - 0.55 * $interval; 
+	$ymax = $mean + 0.45 * $interval; 
+
+	pgsvp(0.1, 0.9, 0.4, 0.68);
+	pgswin($xmin, $xmax, $ymin, $ymax);
+	pgbox(ABCNST,0.0, 0.0, ABCNSTV, 0.0, 0.0);
+
+	plot_fig();
+
+	$ylin1 = $int + $slope * $xmin;
+	$ylin2 = $int + $slope * $xmax;
+	pgmove($xmin, $ylin1);
+	pgdraw($xmax, $ylin2);
+
+	pgptxt($xside2, $ymark_pos2, 0.0, 0.5, "Slope: $slope");
+
+	pgsci(4);
+	pgmove(1411, $ymin);
+	pgdraw(1411, $ymax);
+	pgsci(1);
+
 	pgptxt($xmid, $ybot, 0.0, 0.5, "Time (DOM)");
 
 	pgclos();
@@ -223,7 +304,7 @@ foreach $detector (@detector_list){
 
 	$plot_name = "$detector".'.gif';
 	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp2/pgplot.ps|/data/mta4/MTA/bin/pnmcrop | /data/mta4/MTA/bin/pnmflip -r270 |/data/mta4/MTA/bin/ppmtogif > /data/mta/www/mta_sim_twist/Plots/$plot_name");
-####	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp2/pgplot.ps|/data/mta4/MTA/bin/pnmcrop | /data/mta4/MTA/bin/pnmflip -r270 |/data/mta4/MTA/bin/ppmtogif > ./Plots/$plot_name");
+#####	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp2/pgplot.ps|/data/mta4/MTA/bin/pnmcrop | /data/mta4/MTA/bin/pnmflip -r270 |/data/mta4/MTA/bin/ppmtogif > ./Plots/$plot_name");
 	system("rm ./Sim_twist_temp2/pgplot.ps");
 }
 
@@ -254,7 +335,7 @@ sub plot_fig{
         for($m = 0; $m < $total; $m++){
 		if($ybin[$m] >= $ymin && $ybin[$m] < $ymax){ 
 
-			$symbol = $fid[$m] + 1;
+			$symbol = 2;
 			${fid_cnt.$fid[$m]}++;
 
         		pgsci(${fid_color.$fid[$m]}{color}[0]);
@@ -281,21 +362,21 @@ sub plot_fig{
 		$sig     = 'INDEF';
 	}
 
-
-	least_fit();
-
 	$next = 0;
         for($n = 0; $n < 15; $n++){
                 if(${fid_cnt.$n} > 0){
                         $xpos = $xmin + $next * $step + 0.10 * $step;
                         $xpos2 = $xmin + $next * $step + 0.12 * $step;
                         $mark = $n + 1;
-                        $description = ": FID $n";
+			if($i1 == 2){	
+                        	$description = "ACENT I";
+			}else{
+                        	$description = "ACENT J";
+				least_fit();
+			}
                         $ymark_pos3 = $ymark_pos2 + 0.025 * $ydiff;
-			pgsci(${fid_color.$n}{color}[0]);
-                        pgpt(1, $xpos, $ymark_pos3, $mark);
-                        pgtext($xpos2, $ymark_pos2, "$description");
 			pgsci(1);
+                        pgtext($xpos2, $ymark_pos2, "$description");
                         $next++;
                 }
         }
