@@ -568,7 +568,7 @@ sub plot_data{
 	$total = $icnt;
 	@xbin  = @date;
 
-	pgsvp(0.1, 0.95, 0.82,1.0);
+	pgsvp(0.1, 0.95, 0.81,0.99);
 	pgswin($xmin, $xmax, $ymin_sim_x, $ymax_sim_x);
 	pgbox(ABCST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
 	pgsch(0.8);
@@ -579,7 +579,7 @@ sub plot_data{
 
 	$color = 4;
 
-	pgsvp(0.1, 0.95, 0.63,0.81);
+	pgsvp(0.1, 0.95, 0.62,0.80);
 	pgswin($xmin, $xmax, $ymin_sim_y, $ymax_sim_y);
 	pgbox(ABCST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
 	pgsch(0.8);
@@ -590,7 +590,7 @@ sub plot_data{
 
 	$color = 2;
 
-	pgsvp(0.1, 0.95, 0.44,0.62);
+	pgsvp(0.1, 0.95, 0.43,0.61);
 	pgswin($xmin, $xmax, $ymin_sim_z, $ymax_sim_z);
 	pgbox(ABCST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
 	pgsch(0.8);
@@ -601,7 +601,7 @@ sub plot_data{
 
 	$color = 4;
 
-	pgsvp(0.1, 0.95, 0.25,0.43);
+	pgsvp(0.1, 0.95, 0.24,0.42);
 	pgswin($xmin, $xmax, $ymin_pitchamp, $ymax_pitchamp);
 	pgbox(ABCST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
 	pgsch(0.8);
@@ -612,7 +612,7 @@ sub plot_data{
 
 	$color = 2;
 
-	pgsvp(0.1, 0.95, 0.06,0.24);
+	pgsvp(0.1, 0.95, 0.05,0.23);
 	pgswin($xmin, $xmax, $ymin_yawamp, $ymax_yawamp);
 	pgbox(ABCNSTV,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
 	pgsch(0.8);
@@ -624,7 +624,7 @@ sub plot_data{
 	pgptxt($xmin,$ybot_yawamp, 0.0, 1.0, "Time (DOM)");
 	pgclos();
 
-	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/sim_plot.gif");
+	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/sim_plot.gif");
 ###	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./Plots/sim_plot.gif");
 
 #
@@ -873,7 +873,7 @@ sub plot_data{
 	pgptxt($xmid,$ybot_dtheta, 0.0, 0.5, "Time (DOM)");
 	pgclos();
 
-	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/twist_plot.gif");
+	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/twist_plot.gif");
 ###	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./Plots/twist_plot.gif");
 	system("rm ./Sim_twist_temp/pgplot.ps");
 }
