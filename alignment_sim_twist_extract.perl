@@ -286,7 +286,7 @@ $out_name2 = 'data_info_'."$year";
 		if($counter < 1170 && $counter > 500){
 			$atime = 0.5 *($tbegin + $tlast);
 			$tdy_avg = $tdy_sum/$counter;
-			$tdz_avg = $tdy_sum/$counter;
+			$tdz_avg = $tdz_sum/$counter;
 			$tdt_avg = $tdt_sum/$counter;
 			push(@ttime,   $atime);
 			push(@tdy,     $tdy_avg);
