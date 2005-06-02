@@ -355,32 +355,50 @@ $out_name2 = 'data_info_'."$year";
 ### print_html: print Sim_twist html page            ###
 ########################################################
 
-
 sub print_html{
-	open(OUT, '>/data/mta/www/mta_sim_twist/sim_twist.html');
-	print OUT '<html>',"\n";
-	print OUT '<BODY TEXT="#FFFFFF" BGCOLOR="#000000" LINK="#00CCFF" VLINK="#B6FFFF" ALINK="#FF0000", background ="./stars.jpg">',"\n";
-	print OUT '<h2>SIM Shift and Twist Trends</h2>',"\n";
-	print OUT '<p>',"\n";
-	print OUT 'This page shows trends of SIM shifts (dy and dz) and twist (dtheta). All quantities are directly taken from',"\n";
-	print OUT 'pcaf*_asol1.fits files. The units are mm for dy and dz, and degree for dtheta. At September 22, 2004,',"\n";
-	print OUT 'there is no shifts or twiist are observed, and all values are zero.',"\n";
-	print OUT '<br><br>',"\n";
-	print OUT "<img src='./Plots/twist_plot.gif' width='600' height='600'>","\n";
-	print OUT '<br><br>',"\n";
-	print OUT "<a href='data_extracted'>ASCII Data --- currently empty</a>","\n";
-	print OUT '',"\n";
-	print OUT '<p>',"\n";
-	print OUT 'From the same fits file, we also collected sim_x,y, and z postions, pitch amp, and yaw amp of dithers.',"\n";
-	print OUT '<br><br>',"\n";
-	print OUT "<img src='./Plots/sim_plot.gif' width='600' height='600'>","\n";
-	print OUT '<br><br>',"\n";
-	print OUT "<a href='data_info'>ASCII Data</a>","\n";
-	print OUT '</body>',"\n";
-	print OUT '</html>',"\n";
+        open(OUT, '>/data/mta/www/mta_sim_twist/sim_twist.html');
+        print OUT '<html>',"\n";
+        print OUT '<BODY TEXT="#FFFFFF" BGCOLOR="#000000" LINK="#00CCFF" VLINK="#B6FFFF" ALINK="#FF0000", background ="./stars.jpg">',"\n";
+        print OUT '<h2>SIM Shift and Twist Trends</h2>',"\n";
+        print OUT '<p>',"\n";
+        print OUT 'This page shows trends of SIM shifts (dy and dz) and twist (dtheta). All quantities are directly taken from',"\n";
+        print OUT 'pcaf*_asol1.fits files. The units are mm for dy and dz, and degree for dtheta.',"\n";
+        print OUT 'We fit two lines separated before and after (Days of Mission)= 1400 (May 21, 2003).',"\n";
+        print OUT 'The unit of slopes are mm per day or degree per day.',"\n";
+        print OUT '<p> The sudden shift around DOM = 1400 was due to fid light drift (see a memo by Aldocroft fiducial light drfit).',"\n";
+        print OUT '<br><br>',"\n";
+        print OUT "<img src='./Plots/twist_plot.gif' width='600' height='600'>","\n";
+        print OUT '<br><br>',"\n";
 
-	close(OUT);
+        print OUT '<p>For dtheta, data are further devided into smaller groups according to which instrument was used (ACIS-I, ACIS-S,',"\n";
+        print OUT 'HRC-I, and HRC-S)<br><br>',"\n";
+        print OUT "<img src='./Plots/dtheta_plot.gif' width='600' height='600'>","\n";
+
+        print OUT '<p> Following is ASCII data tables for the data plotted above. The entires are time in seconds from',"\n";
+        print OUT ' Jan 1, 1998, dy, dz, and dtheta. All entires are 5 min avaerage.<br><br> ',"\n";
+
+        for($wyear = 2000; $wyear <= $year; $wyear++){
+                $name = './Data/data_extracted_'."$wyear";
+                print OUT "<a href='$name'> ASCII Data for year:  $wyear</a><br>","\n";
+        }
+        print OUT '<p>',"\n";
+        print OUT 'From the same fits file, we also collected sim_x,y, and z postions, pitch amp, and yaw amp of dithers.',"\n";
+        print OUT '<br><br>',"\n";
+        print OUT "<img src='./Plots/sim_plot.gif' width='600' height='600'>","\n";
+        print OUT '<br><br>',"\n";
+
+        print OUT '<p>Following is ASCII data tables for the data plotted above. The entries are Fits file name,',"\n";
+        print OUT ' tstart, tstop, sim_x, sim_y, sim_z, pitchamp, and yawamp.<br><br>',"\n";
+        for($wyear = 2000; $wyear <= $year; $wyear++){
+                $name = './Data/data_info_'."$wyear";
+                print OUT "<a href='$name'> ASCII Data for year:  $wyear</a><br>","\n";
+        }
+        print OUT '</body>',"\n";
+        print OUT '</html>',"\n";
+
+        close(OUT);
 }
+
 
 
 ##########################################################################
