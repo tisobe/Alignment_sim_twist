@@ -1,4 +1,7 @@
 #!/usr/bin/perl
+BEGIN { $ENV{'SYBASE'} = "/soft/sybase"; }
+use DBI;
+use DBD::Sybase;
 use PGPLOT;
 
 #########################################################################################
@@ -18,6 +21,9 @@ use PGPLOT;
 #---- the last day of the last month. Here we assume that the script is run on
 #---- the first of the new month.
 #
+$db_user   = "browser";
+$server    = "ocatsqlsrv";
+$db_passwd = 'newuser';
 
 $file = $ARGV[0];		# if you want to use a data file, here is the input
 
@@ -245,7 +251,12 @@ $out_name2 = 'data_info_'."$year";
 			}elsif($_ =~ /YAWAMP/){
 				@btemp = split(/\s+/, $_);
 				$yawamp = $btemp[2];
+			}elsif($_ =~ /OBS_ID/){
+				@btemp = split(/\s+/, $_);
+				$obsid = $btemp[2];
+				$obsid =~ s/\'//g;
 			}
+	
 		
 
 			@atemp = split(/\s+/, $_);
@@ -295,10 +306,12 @@ $out_name2 = 'data_info_'."$year";
 			$cnt++;
 		}
 
+		get_inst_name();
+
 		system("rm ./Sim_twist_temp/zout");
 
 		@ctemp = split(/\//, $file);
-		print OUT2 "$ctemp[2]\t$date_obs\t$date_end\t$sim_x\t$sim_y\t$sim_z\t";
+		print OUT2 "$ctemp[2]\t$obsid\t$instrument\t$date_obs\t$date_end\t$sim_x\t$sim_y\t$sim_z\t";
 		print OUT2 "$pitchamp\t$yawamp\n";
 
 #
@@ -314,7 +327,7 @@ $out_name2 = 'data_info_'."$year";
 #--- print out only when dy, dz, or dtheta have values
 #
 				if($dy[$i] > 0 || $dz[$i] > 0 || $dtheta[$i]> 0){
-					print OUT "$time[$i]\t$dy[$i]\t$dz[$i]\t$dtheta[$i]\n";
+					print OUT "$time[$i]\t$obsid\t$instrument\t$dy[$i]\t$dz[$i]\t$dtheta[$i]\n";
 				}
 			}
 		$total = $cnt;
@@ -328,7 +341,7 @@ $out_name2 = 'data_info_'."$year";
 					$total++;
 	
 					if($dy[$total] > 0 || $dz[$total] > 0 || $dtheta[$total] > 0){
-						print OUT "$time[$total]\t$dy[$total]\t$dz[$total]\t$dtheta[$total]\n";
+						print OUT "$time[$total]\t$obsid\t$instrument\t$dy[$total]\t$dz[$total]\t$dtheta[$total]\n";
 					}
 				}
 			}
@@ -384,7 +397,19 @@ sub plot_data{
 	@dy     = ();
 	@dz     = ();
 	@dtheta = ();
+	@dt_a_i = ();
+	@dt_a_s = ();
+	@dt_h_i = ();
+	@dt_h_s = ();
+	@dm_a_i = ();
+	@dm_a_s = ();
+	@dm_h_i = ();
+	@dm_h_s = ();
 	$dcnt   = 0;
+	$dn_a_i = 0;
+	$dn_a_s = 0;
+	$dn_h_i = 0;
+	$dn_h_s = 0;
 	foreach $ent (@data_file){
 		open(FH, "$ent");
 		while(<FH>){
@@ -392,9 +417,26 @@ sub plot_data{
 			@atemp = split(/\s+/, $_);
 			$dom = $atemp[0]/86400 - 567;
 			push(@time,   $dom);
-			push(@dy,     $atemp[1]);
-			push(@dz,     $atemp[2]);
-			push(@dtheta, $atemp[3]);
+			push(@dy,     $atemp[3]);
+			push(@dz,     $atemp[4]);
+			push(@dtheta, $atemp[5]);
+			if($atemp[2] =~ /ACIS-I/i){
+				push(@dt_a_i, $atemp[5]);
+				push(@dm_a_i, $dom);
+				$dn_a_i++;
+			}elsif($atemp[2] =~ /ACIS-S/i){
+				push(@dt_a_s, $atemp[5]);
+				push(@dm_a_s, $dom);
+				$dn_a_s++;
+			}elsif($atemp[2] =~ /HRC-I/i){
+				push(@dt_h_i, $atemp[5]);
+				push(@dm_h_i, $dom);
+				$dn_h_i++;
+			}elsif($atemp[2] =~ /HRC-S/i){
+				push(@dt_h_s, $atemp[5]);
+				push(@dm_h_s, $dom);
+				$dn_h_s++;
+			}
 			$dcnt++;
 		}
 		close(FH);
@@ -417,7 +459,7 @@ sub plot_data{
 		while(<FH>){
 			chomp $_;
 			@atemp = split(/\s+/, $_);
-			@btemp = split(/T/, $atemp[1]);
+			@btemp = split(/T/, $atemp[3]);
 			@ctemp = split(/-/, $btemp[0]);
 			$year = $ctemp[0];
 			$month = $ctemp[1];
@@ -476,11 +518,11 @@ sub plot_data{
 			$add += ($hour/24 + $min/1440 + $sec/86400);
 	
 			push(@date,     $add);
-			push(@sim_x,    $atemp[3]);
-			push(@sim_y,    $atemp[4]);
-			push(@sim_z,    $atemp[5]);
-			push(@pitchamp, $atemp[6]);
-			push(@yawamp,   $atemp[7]);
+			push(@sim_x,    $atemp[5]);
+			push(@sim_y,    $atemp[6]);
+			push(@sim_z,    $atemp[7]);
+			push(@pitchamp, $atemp[8]);
+			push(@yawamp,   $atemp[9]);
 			$icnt++;
 		}
 		close(FH);
@@ -496,6 +538,7 @@ sub plot_data{
 	$xmax  = $xmax + 0.01 * $xdiff;
 	$xmid  = $xmin + 0.50 * $xdiff;
 	$xside = $xmin - 0.10 * $xdiff;
+	$xside2= $xmin - 0.12 * $xdiff;
 			
 	@temp        = sort{$a<=>$b} @sim_x;
 	$ymin_sim_x  = $temp[0];
@@ -568,7 +611,7 @@ sub plot_data{
 	$total = $icnt;
 	@xbin  = @date;
 
-	pgsvp(0.1, 0.95, 0.81,0.99);
+	pgsvp(0.1, 0.95, 0.82,1.0);
 	pgswin($xmin, $xmax, $ymin_sim_x, $ymax_sim_x);
 	pgbox(ABCST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
 	pgsch(0.8);
@@ -579,7 +622,7 @@ sub plot_data{
 
 	$color = 4;
 
-	pgsvp(0.1, 0.95, 0.62,0.80);
+	pgsvp(0.1, 0.95, 0.63,0.81);
 	pgswin($xmin, $xmax, $ymin_sim_y, $ymax_sim_y);
 	pgbox(ABCST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
 	pgsch(0.8);
@@ -590,7 +633,7 @@ sub plot_data{
 
 	$color = 2;
 
-	pgsvp(0.1, 0.95, 0.43,0.61);
+	pgsvp(0.1, 0.95, 0.44,0.62);
 	pgswin($xmin, $xmax, $ymin_sim_z, $ymax_sim_z);
 	pgbox(ABCST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
 	pgsch(0.8);
@@ -601,7 +644,7 @@ sub plot_data{
 
 	$color = 4;
 
-	pgsvp(0.1, 0.95, 0.24,0.42);
+	pgsvp(0.1, 0.95, 0.25,0.43);
 	pgswin($xmin, $xmax, $ymin_pitchamp, $ymax_pitchamp);
 	pgbox(ABCST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
 	pgsch(0.8);
@@ -612,7 +655,7 @@ sub plot_data{
 
 	$color = 2;
 
-	pgsvp(0.1, 0.95, 0.05,0.23);
+	pgsvp(0.1, 0.95, 0.06,0.24);
 	pgswin($xmin, $xmax, $ymin_yawamp, $ymax_yawamp);
 	pgbox(ABCNSTV,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
 	pgsch(0.8);
@@ -624,7 +667,7 @@ sub plot_data{
 	pgptxt($xmin,$ybot_yawamp, 0.0, 1.0, "Time (DOM)");
 	pgclos();
 
-	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/sim_plot.gif");
+	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/sim_plot.gif");
 ###	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./Plots/sim_plot.gif");
 
 #
@@ -873,9 +916,218 @@ sub plot_data{
 	pgptxt($xmid,$ybot_dtheta, 0.0, 0.5, "Time (DOM)");
 	pgclos();
 
-	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/twist_plot.gif");
+	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/twist_plot.gif");
 ###	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./Plots/twist_plot.gif");
 	system("rm ./Sim_twist_temp/pgplot.ps");
+
+#
+#----- dtheta detail plots (ACIS-I, ACIS-S, HRC-I, HRC-S)
+#
+	pgbegin(0,'"./Sim_twist_temp/pgplot.ps"/cps',1,1);
+	pgsch(1);
+	pgslw(3);
+
+	$ped[0] = 0.98;
+	$ped[1] = 0.75;
+	$ped[2] = 0.52;
+	$ped[3] = 0.30;
+	
+	$pst[0] = 0.76;
+	$pst[1] = 0.53;
+	$pst[2] = 0.31;
+	$pst[3] = 0.08;
+	
+	$pnl_cnt = 0;
+
+#----- ACIS-I
+
+	if($dn_a_i > 0){
+        	@xdata  = @dm_a_i;
+        	@ydata  = @dt_a_i;
+        	$data_cnt = $dn_a_i;
+        	robust_fit();
+        	$dt_int   = $int;
+        	$dt_slope = $slope;
+        	$dt_disp  = sprintf "%4.3e", $slope;
+
+		$avg = $int + $slope * $xbin[$data_cnt/2];
+	
+		$ymin = $avg - 0.01;
+		$ymax = $avg + 0.01;
+        	$ydiff      = $ymax - $ymin;
+
+        	$ymid  = $ymin + 0.50 * $ydiff;
+        	$yside = $ymin + 0.50 * $ydiff;
+        	$ytop  = $ymax + 0.05 * $ydiff;
+        	$ybot  = $ymin + 0.20 * $ydiff;
+        	$ytop1 = $ymax - 0.10 * $ydiff;
+        	pgsvp(0.15, 0.98, $pst[$pnl_cnt], $ped[$pnl_cnt]);
+        	pgswin($xmin, $xmax, $ymin, $ymax);
+		pgbox(ABCST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
+        	pgptxt($xside2,$ymid, 90.0, 0.5, "dtheta (deg)");
+	
+		@xbin  = @dm_a_i;
+		@ybin  = @dt_a_i;
+		$total = $dn_a_i;
+
+        	plot_fig();
+	
+        	pgsci(3);
+        	$ysmin = $dt_int + $dt_slope * $xmin;
+        	$ysmax = $dt_int + $dt_slope * $xmax;
+        	pgmove($xmin, $ysmin);
+        	pgdraw($xmax, $ysmax);
+        	pgsci(1);
+        	$xdpos = $xmin + 0.04 * $xdiff;
+	
+        	pgptxt($xdpos,$ytop1, 0.0, 0.0, "ACIS-I      Slope: $dt_disp");
+        	$pnl_cnt++;
+	}
+	
+#----- ACIS-S
+
+	if($dn_a_s > 0){
+        	@xdata  = @dm_a_s;
+        	@ydata  = @dt_a_s;
+        	$data_cnt = $dn_a_s;
+        	robust_fit();
+        	$dt_int   = $int;
+        	$dt_slope = $slope;
+        	$dt_disp  = sprintf "%4.3e", $slope;
+
+		$avg = $int + $slope * $xbin[$data_cnt/2];
+	
+		$ymin = $avg - 0.01;
+		$ymax = $avg + 0.01;
+        	$ydiff      = $ymax - $ymin;
+
+        	$ymid  = $ymin + 0.50 * $ydiff;
+        	$yside = $ymin + 0.50 * $ydiff;
+        	$ytop  = $ymax + 0.05 * $ydiff;
+        	$ybot  = $ymin + 0.20 * $ydiff;
+        	$ytop1 = $ymax - 0.10 * $ydiff;
+	
+        	@xbin  = @dm_a_s;
+        	@ybin  = @dt_a_s;
+        	$total = $dn_a_s;
+	
+        	pgsvp(0.15, 0.98, $pst[$pnl_cnt], $ped[$pnl_cnt]);
+        	pgswin($xmin, $xmax, $ymin, $ymax);
+		pgbox(ABCST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
+        	pgptxt($xside2,$ymid, 90.0, 0.5, "dtheta (deg)");
+	
+        	plot_fig();
+	
+        	pgsci(3);
+        	$ysmin = $dt_int + $dt_slope * $xmin;
+        	$ysmax = $dt_int + $dt_slope * $xmax;
+        	pgmove($xmin, $ysmin);
+        	pgdraw($xmax, $ysmax);
+        	pgsci(1);
+        	$xdpos = $xmin + 0.04 * $xdiff;
+	
+        	pgptxt($xdpos,$ytop1, 0.0, 0.0, "ACIS-S      Slope: $dt_disp");
+        	$pnl_cnt++;
+	}
+
+#-----  HRC-I
+
+	if($dn_h_i > 0){
+        	@xdata  = @dm_h_i;
+        	@ydata  = @dt_h_i;
+        	$data_cnt = $dn_h_i;
+        	robust_fit();
+        	$dt_int   = $int;
+        	$dt_slope = $slope;
+        	$dt_disp  = sprintf "%4.3e", $slope;
+
+		$avg = $int + $slope * $xbin[$data_cnt/2];
+	
+		$ymin = $avg - 0.01;
+		$ymax = $avg + 0.01;
+        	$ydiff      = $ymax - $ymin;
+
+        	$ymid  = $ymin + 0.50 * $ydiff;
+        	$yside = $ymin + 0.50 * $ydiff;
+        	$ytop  = $ymax + 0.05 * $ydiff;
+        	$ybot  = $ymin + 0.20 * $ydiff;
+        	$ytop1 = $ymax - 0.10 * $ydiff;
+	
+        	@xbin  = @dm_h_i;
+        	@ybin  = @dt_h_i;
+        	$total = $dn_h_i;
+	
+        	pgsvp(0.15, 0.98, $pst[$pnl_cnt], $ped[$pnl_cnt]);
+        	pgswin($xmin, $xmax, $ymin, $ymax);
+		pgbox(ABCST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
+        	pgptxt($xside,$ymax, 90.0, 0.5, "dtheta (deg)");
+	
+        	plot_fig();
+	
+        	pgsci(3);
+        	$ysmin = $dt_int + $dt_slope * $xmin;
+        	$ysmax = $dt_int + $dt_slope * $xmax;
+        	pgmove($xmin, $ysmin);
+        	pgdraw($xmax, $ysmax);
+        	pgsci(1);
+        	$xdpos = $xmin + 0.04 * $xdiff;
+	
+        	pgptxt($xdpos,$ytop1, 0.0, 0.0, "HRC-I      Slope: $dt_disp");
+        	$pnl_cnt++;
+	}
+
+#-----  HRC-S
+
+	if($dn_h_s > 0){
+        	@xdata  = @dm_h_s;
+        	@ydata  = @dt_h_s;
+        	$data_cnt = $dn_h_s;
+        	robust_fit();
+        	$dt_int   = $int;
+        	$dt_slope = $slope;
+        	$dt_disp  = sprintf "%4.3e", $slope;
+
+		$avg = $int + $slope * $xbin[$data_cnt/2];
+	
+		$ymin = $avg - 0.01;
+		$ymax = $avg + 0.01;
+        	$ydiff      = $ymax - $ymin;
+
+        	$ymid  = $ymin + 0.50 * $ydiff;
+        	$yside = $ymin + 0.50 * $ydiff;
+        	$ytop  = $ymax + 0.05 * $ydiff;
+        	$ybot  = $ymin + 0.20 * $ydiff;
+        	$ybot2 = $ymin - 0.10 * $ydiff;
+        	$ytop1 = $ymax - 0.10 * $ydiff;
+	
+        	@xbin  = @dm_h_s;
+        	@ybin  = @dt_h_s;
+        	$total = $dn_h_s;
+	
+        	pgsvp(0.15, 0.98, $pst[$pnl_cnt], $ped[$pnl_cnt]);
+        	pgswin($xmin, $xmax, $ymin, $ymax);
+		pgbox(ABCNST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
+        	pgptxt($xside2,$ymid, 90.0, 0.5, "dtheta (deg)");
+	
+        	plot_fig();
+	
+        	pgsci(3);
+        	$ysmin = $dt_int + $dt_slope * $xmin;
+        	$ysmax = $dt_int + $dt_slope * $xmax;
+        	pgmove($xmin, $ysmin);
+        	pgdraw($xmax, $ysmax);
+        	pgsci(1);
+        	$xdpos = $xmin + 0.04 * $xdiff;
+	
+        	pgptxt($xdpos,$ytop1, 0.0, 0.0, "HRC-S      Slope: $dt_disp");
+        	$pnl_cnt++;
+	}
+	pgptxt($xmin, $ybot2, 0.0, 1.0, "Time(DOM)");
+	pgclos();
+	
+    	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/dtheta_plot.gif");
+###  	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./Plots/dtheta_plot.gif");
+
 }
 
 ########################################################
@@ -934,5 +1186,211 @@ sub least_fit {
                         -2.0 *($s_int * $sumy + $slope * $sumxy
                         - $s_int * $slope * $sumx))/$tot1;
         $sigm_slope = sqrt($variance * $sum/$delta);
+}
+
+##########################################################################################
+##########################################################################################
+##########################################################################################
+
+sub get_inst_name{
+        my $db = "server=$server;database=axafocat";
+        $dsn1 = "DBI:Sybase:$db";
+        $dbh1 = DBI->connect($dsn1, $db_user, $db_passwd, { PrintError => 0, RaiseError => 1});
+
+        $sqlh1 = $dbh1->prepare(qq(select
+                instrument
+        from target where obsid=$obsid));
+
+       $sqlh1->execute();
+        @targetdata = $sqlh1->fetchrow_array;
+        $sqlh1->finish;
+
+
+
+        $instrument = $targetdata[0];
+        $instrument =~ s/\s//g;
+
+}
+
+####################################################################
+### robust_fit: linear fit for data with medfit robust fit metho  ##
+####################################################################
+
+sub robust_fit{
+        $sumx = 0;
+        $symy = 0;
+        for($n = 0; $n < $data_cnt; $n++){
+                $sumx += $xdata[$n];
+                $symy += $ydata[$n];
+        }
+        $xavg = $sumx/$data_cnt;
+        $yavg = $sumy/$data_cnt;
+#
+#--- robust fit works better if the intercept is close to the
+#--- middle of the data cluster.
+#
+        @xbin = ();
+        @ybin = ();
+        for($n = 0; $n < $data_cnt; $n++){
+                $xbin[$n] = $xdata[$n] - $xavg;
+                $ybin[$n] = $ydata[$n] - $yavg;
+        }
+
+        $total = $data_cnt;
+        medfit();
+
+        $alpha += $beta * (-1.0 * $xavg) + $yavg;
+
+        $int   = $alpha;
+        $slope = $beta;
+}
+
+
+####################################################################
+### medfit: robust filt routine                                  ###
+####################################################################
+
+sub medfit{
+
+#########################################################################
+#                                                                       #
+#       fit a straight line according to robust fit                     #
+#       Numerical Recipes (FORTRAN version) p.544                       #
+#                                                                       #
+#       Input:          @xbin   independent variable                    #
+#                       @ybin   dependent variable                      #
+#                       total   # of data points                        #
+#                                                                       #
+#       Output:         alpha:  intercept                               #
+#                       beta:   slope                                   #
+#                                                                       #
+#       sub:            rofunc evaluate SUM( x * sgn(y- a - b * x)      #
+#                       sign   FORTRAN/C sign function                  #
+#                                                                       #
+#########################################################################
+
+        my $sx  = 0;
+        my $sy  = 0;
+        my $sxy = 0;
+        my $sxx = 0;
+
+        my (@xt, @yt, $del,$bb, $chisq, $b1, $b2, $f1, $f2, $sigb);
+#
+#---- first compute least sq solution
+#
+        for($j = 0; $j < $total; $j++){
+                $xt[$j] = $xbin[$j];
+                $yt[$j] = $ybin[$j];
+                $sx  += $xbin[$j];
+                $sy  += $ybin[$j];
+                $sxy += $xbin[$j] * $ybin[$j];
+                $sxx += $xbin[$j] * $xbin[$j];
+        }
+
+        $del = $total * $sxx - $sx * $sx;
+#
+#----- least sq. solutions
+#
+        $aa = ($sxx * $sy - $sx * $sxy)/$del;
+        $bb = ($total * $sxy - $sx * $sy)/$del;
+        $asave = $aa;
+        $bsave = $bb;
+
+        $chisq = 0.0;
+        for($j = 0; $j < $total; $j++){
+                $diff   = $ybin[$j] - ($aa + $bb * $xbin[$j]);
+                $chisq += $diff * $diff;
+        }
+        $sigb = sqrt($chisq/$del);
+        $b1   = $bb;
+        $f1   = rofunc($b1);
+        $b2   = $bb + sign(3.0 * $sigb, $f1);
+        $f2   = rofunc($b2);
+
+        $iter = 0;
+        OUTER:
+        while($f1 * $f2 > 0.0){
+                $bb = 2.0 * $b2 - $b1;
+                $b1 = $b2;
+                $f1 = $f2;
+                $b2 = $bb;
+                $f2 = rofunc($b2);
+                $iter++;
+                if($iter > 100){
+                        last OUTER;
+                }
+        }
+
+        $sigb *= 0.01;
+        $iter = 0;
+        OUTER1:
+        while(abs($b2 - $b1) > $sigb){
+                $bb = 0.5 * ($b1 + $b2);
+                if($bb == $b1 || $bb == $b2){
+                        last OUTER1;
+                }
+                $f = rofunc($bb);
+                if($f * $f1 >= 0.0){
+                        $f1 = $f;
+                        $b1 = $bb;
+                }else{
+                        $f2 = $f;
+                        $b2 = $bb;
+                }
+                $iter++;
+                if($iter > 100){
+                        last OTUER1;
+                }
+        }
+        $alpha = $aa;
+        $beta  = $bb;
+        if($iter >= 100){
+                $alpha = $asave;
+                $beta  = $bsave;
+        }
+        $abdev = $abdev/$total;
+}
+
+##########################################################
+### rofunc: evaluatate 0 = SUM[ x *sign(y - a bx)]     ###
+##########################################################
+
+sub rofunc{
+        my ($b_in, @arr, $n1, $nml, $nmh, $sum);
+
+        ($b_in) = @_;
+        $n1  = $total + 1;
+        $nml = 0.5 * $n1;
+        $nmh = $n1 - $nml;
+        @arr = ();
+        for($j = 0; $j < $total; $j++){
+                $arr[$j] = $ybin[$j] - $b_in * $xbin[$j];
+        }
+        @arr = sort{$a<=>$b} @arr;
+        $aa = 0.5 * ($arr[$nml] + $arr[$nmh]);
+        $sum = 0.0;
+        $abdev = 0.0;
+        for($j = 0; $j < $total; $j++){
+                $d = $ybin[$j] - ($b_in * $xbin[$j] + $aa);
+                $abdev += abs($d);
+                $sum += $xbin[$j] * sign(1.0, $d);
+        }
+        return($sum);
+}
+
+
+##########################################################
+### sign: sign function                                ###
+##########################################################
+
+sub sign{
+        my ($e1, $e2, $sign);
+        ($e1, $e2) = @_;
+        if($e2 >= 0){
+                $sign = 1;
+        }else{
+                $sign = -1;
+        }
+        return $sign * $e1;
 }
 
