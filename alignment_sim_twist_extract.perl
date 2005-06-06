@@ -365,7 +365,8 @@ sub print_html{
         print OUT 'pcaf*_asol1.fits files. The units are mm for dy and dz, and degree for dtheta.',"\n";
         print OUT 'We fit two lines separated before and after (Days of Mission)= 1400 (May 21, 2003).',"\n";
         print OUT 'The unit of slopes are mm per day or degree per day.',"\n";
-        print OUT '<p> The sudden shift around DOM = 1400 was due to fid light drift (see a memo by Aldocroft fiducial light drfit).',"\n";
+        print OUT '<p> The sudden shift around DOM = 1400 was due to fid light drift (see a memo by Aldocroft';
+	print OUT '<a href='http://cxc.harvard.edu/mta/ASPECT/fid_drift/'> fiducial light drfit</a>).',"\n";
         print OUT '<br><br>',"\n";
         print OUT "<img src='./Plots/twist_plot.gif' width='600' height='600'>","\n";
         print OUT '<br><br>',"\n";
@@ -968,10 +969,12 @@ sub plot_data{
         	$dt_slope = $slope;
         	$dt_disp  = sprintf "%4.3e", $slope;
 
-		$avg = $int + $slope * $xbin[$data_cnt/2];
-	
-		$ymin = $avg - 0.01;
-		$ymax = $avg + 0.01;
+#		$avg = $int + $slope * $xbin[$data_cnt/2];
+#	
+#		$ymin = $avg - 0.01;
+#		$ymax = $avg + 0.01;
+		$ymin = -0.01;
+		$ymax =  0.015;
         	$ydiff      = $ymax - $ymin;
 
         	$ymid  = $ymin + 0.50 * $ydiff;
@@ -1013,10 +1016,12 @@ sub plot_data{
         	$dt_slope = $slope;
         	$dt_disp  = sprintf "%4.3e", $slope;
 
-		$avg = $int + $slope * $xbin[$data_cnt/2];
-	
-		$ymin = $avg - 0.01;
-		$ymax = $avg + 0.01;
+#		$avg = $int + $slope * $xbin[$data_cnt/2];
+#	
+#		$ymin = $avg - 0.01;
+#		$ymax = $avg + 0.01;
+		$ymin = -0.01;
+		$ymax =  0.015;
         	$ydiff      = $ymax - $ymin;
 
         	$ymid  = $ymin + 0.50 * $ydiff;
@@ -1059,10 +1064,12 @@ sub plot_data{
         	$dt_slope = $slope;
         	$dt_disp  = sprintf "%4.3e", $slope;
 
-		$avg = $int + $slope * $xbin[$data_cnt/2];
-	
-		$ymin = $avg - 0.01;
-		$ymax = $avg + 0.01;
+#		$avg = $int + $slope * $xbin[$data_cnt/2];
+#	
+#		$ymin = $avg - 0.01;
+#		$ymax = $avg + 0.01;
+		$ymin = -0.01;
+		$ymax =  0.015;
         	$ydiff      = $ymax - $ymin;
 
         	$ymid  = $ymin + 0.50 * $ydiff;
@@ -1105,10 +1112,12 @@ sub plot_data{
         	$dt_slope = $slope;
         	$dt_disp  = sprintf "%4.3e", $slope;
 
-		$avg = $int + $slope * $xbin[$data_cnt/2];
-	
-		$ymin = $avg - 0.01;
-		$ymax = $avg + 0.01;
+#		$avg = $int + $slope * $xbin[$data_cnt/2];
+#	
+#		$ymin = $avg - 0.01;
+#		$ymax = $avg + 0.01;
+		$ymin = -0.01;
+		$ymax =  0.015;
         	$ydiff      = $ymax - $ymin;
 
         	$ymid  = $ymin + 0.50 * $ydiff;
