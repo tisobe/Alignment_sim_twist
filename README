@@ -1,7 +1,10 @@
 
+Sim_twist contains two disctinct tasks
+	1. Fid light shift monitoring
+	2. Sim shift/twist monitoring
 
 ##########################
-How to run Sim_twist taks
+How to run Sim_twist task
 ###########################
 
 Go to any run directory and call the following wrap scrit:
@@ -10,11 +13,13 @@ Go to any run directory and call the following wrap scrit:
 
 The final results will be saved in:
 
-	/data/mta_www/mta_sim_twist/
+	/data/mta_www/mta_sim_twist/Data/
+	/data/mta_www/mta_sim_twist/Plots/
 
 or you can see the results on the html page at:
 
 	http://cxc.harvard.edu/mta_days/mta_sim_twist/fid_light_drift.html
+	http://asc.harvard.edu/mta_days/mta_sim_twist/sim_twist.html
 
 
 
@@ -26,23 +31,39 @@ Directory and file descriptions for Sim_twist tasks
 
 /data/mta4/MTA/doc/Alignment/Sim_twist/
 ---------------------------------------
-	task_descriptions: This file
+	README: this file
 
-/data/mta4/MTA/data/Alignment/Sim_twist/
+/data/mta_www/mta_sim_twist/
 ----------------------------------------
-	Data: data directory: I-1, I-2, etc contain ACA positional information
+	fid_light_drift.html:	html page for fid light shift 
+	sim_twist.html:		html page ofr sim shift/tiwst
+	fid_*.gif:		gif file showing fid light aiming positions
+	Data: 		data directory: 
+				I-1, I-2, etc contain ACA positional information
+				data_info_<year> contain sim postion etc informaiton
+				data_extracted_<year> contain sim shift and twist information
 	Html_dir:	html page depository I-1.html, I-2.html, etc
 			fid_light_drift.htm: fid light drift main page
 			sim_twist.html:	     sim twist main page
-	Plots:		plots depository, I-1.gif, I-2.gif, etc 
-			sim_plot.gif and twist_plot.gif are also kept here.
-	data_extracted: A list of dy, dz, and dtheta
-	data_info:	sim x y z pitch amp yaw amp list
+	Plots:		plots depository, 
+				I-1.gif, I-2.gif, etc : fid light related plots
+				sim_plot.gif: sim infornation plots
+				twist_plot.gif: sim shift and twist trend plots
+				dtheta_plot.gif: detail plots for dtheta plot
 
 
 
 /data/mta4/MTA/bin:
 -------------------
+alignment_sim_twist_wrap_script:	control script
+alignment_sim_twist_main_script		this actually run the perl script listed below
+
+alignment_sim_twist_extract.perl
+alignment_sim_twist_extract_acadata.perl
+alignment_sim_twist_fid_trend_plots.perl
+alignment_sim_twist_remove_dupl.perl
+
+alignment_sim_twist_relation_plot.perl
 
 pnmflip:	c script which rotates a ppm figure
 
@@ -62,7 +83,7 @@ Input:
 	/data/mta4/MTA/data/.dare: 	a user name
 	/data/mta4/MTA/data/.hakama:	a user password
 
-	pcadf*_osol1.fits: These files are obtained from database using arc4gl.
+	pcadf*_asol1.fits: These files are obtained from database using arc4gl.
 			   While computing, the data are save in ./Sim_twist_temp/.
 			   This directory will be created when needed, and deleted 
 			   after computation is finished.
@@ -72,11 +93,11 @@ Output:
 			A list of dy, dz, and dtheta; only when one of them have none 
 			zero values, they are entered.
 		List entries
-		time    dy    dz    dtheta
+		time    obsid	 instrument	dy    dz    dtheta
 
 	/data/mta4/MTA/data/Sim_twist/data_info
 		List entries
-		time obs_start obs_end sim_x sim_y sim_z pitch_amp yaw_amp
+		time obsid  obs_start obs_end sim_x sim_y sim_z pitch_amp yaw_amp
 	
 
 ----------------------------------------
@@ -122,3 +143,17 @@ Input:
 Output:
 	 /data/mta4/MTA/data/Sim_twist/Plots/<plot_name>
 		where <plot_name> is I-1.gif, I-2.gif... etc
+
+------------------------------------
+alignment_sim_twist_remove_dupl.perl
+------------------------------------
+
+This script removes duplicated data line from data in /data/mta/www/mta_sim_twist/Data/
+
+
+--------------------------------------
+alignment_sim_twist_relation_plot.perl
+--------------------------------------
+
+This script plots relationship among sim position, picthangle, yawangle. The results are not
+displayed in  the web site.

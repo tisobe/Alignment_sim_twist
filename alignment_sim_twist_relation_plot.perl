@@ -13,11 +13,13 @@ use PGPLOT;
 #########################################################################################
 
 
+($usec, $umin, $uhour, $umday, $umon, $uyear, $uwday, $uyday, $uisdst)= localtime(time);
+
+$this_year = 1900 + $uyear;
+
 #
 #--- read data 
 #
-
-open(FH, "/data/mta/www/mta_sim_twist/Data/data_info");
 
 @date_obs = ();
 @date_end = ();
@@ -28,19 +30,23 @@ open(FH, "/data/mta/www/mta_sim_twist/Data/data_info");
 @yawamp   = ();
 $cnt      = 0;
 
-while(<FH>){
-	chomp $_;
-	@atemp = split(/\s+/, $_);
-	push(@date_obs , $atemp[1]);
-	push(@date_end , $atemp[2]);
-	push(@sim_x    , $atemp[3]);
-	push(@sim_y    , $atemp[4]);
-	push(@sim_z    , $atemp[5]);
-	push(@pitchamp , $atemp[6]);
-	push(@yawamp   , $atemp[7]);
-	$cnt++;
+for($year = 2000; $year <= $this_year; $year++){
+	$in_data = 'data_info_'."$year";
+	open(FH, "/data/mta/www/mta_sim_twist/Data/$in_data");
+	while(<FH>){
+		chomp $_;
+		@atemp = split(/\s+/, $_);
+		push(@date_obs , $atemp[1]);
+		push(@date_end , $atemp[2]);
+		push(@sim_x    , $atemp[3]);
+		push(@sim_y    , $atemp[4]);
+		push(@sim_z    , $atemp[5]);
+		push(@pitchamp , $atemp[6]);
+		push(@yawamp   , $atemp[7]);
+		$cnt++;
+	}
+	close(FH);
 }
-close(FH);
 
 $total = $cnt;
 
@@ -154,8 +160,8 @@ pgptxt($sim_x_bot,$yawamp_mid, 90.0, 0.5, "yawamp");
 pgptxt($sim_x_mid,$yawamp_bot,  0.0, 0.5, "sim_x");
 
 pgclos();
-###system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/sim_x_base.gif");
-system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./sim_x_base.gif");
+system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/sim_x_base.gif");
+###system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./sim_x_base.gif");
 
 #
 #--- plot fig: sim_z base
@@ -185,8 +191,8 @@ pgptxt($sim_z_bot2,$yawamp_mid, 90.0, 0.5, "yawamp");
 pgptxt($sim_z_mid,$yawamp_bot,  0.0, 0.5, "sim_z");
 
 pgclos();
-###system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/sim_z_base.gif");
-system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./sim_z_base.gif");
+system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/sim_z_base.gif");
+###system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./sim_z_base.gif");
 
 #
 #--- plot fig: pitchamp base
@@ -206,8 +212,8 @@ pgptxt($pitchamp_bot, $yawamp_mid, 90.0, 0.5, "yawamp");
 pgptxt($pitchamp_mid,$yawamp_bot,  0.0, 0.5, "pitchamp");
 
 pgclos();
-###system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/pichamp_base.gif");
-system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./pitchamp_base.gif");
+system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/pichamp_base.gif");
+###system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./pitchamp_base.gif");
 
 
 system("rm pgplot.ps");

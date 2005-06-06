@@ -6,11 +6,12 @@ use PGPLOT;
 
 #########################################################################################
 #											#
-#	extract.perl: extract dy, dz, and dtheta value, and make trend plots		#
+#	alignment_sim_twist_extract.perl: extract dy, dz, and dtheta value, and         #
+#			                  make trend plots				#
 #											#
 #		author: t. isobe (tisobe@cfa.harvard.edu)				#
 #											#
-#		last update: Dec 29, 2004						#
+#		last update: June 6, 2004						#
 #											#
 #########################################################################################
 
