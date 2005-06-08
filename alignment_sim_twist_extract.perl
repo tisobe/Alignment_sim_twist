@@ -379,7 +379,7 @@ sub print_html{
         print OUT '<p> Following is ASCII data tables for the data plotted above. The entires are time in seconds from',"\n";
         print OUT ' Jan 1, 1998, dy, dz, and dtheta. All entires are 5 min avaerage.<br><br> ',"\n";
 
-        for($wyear = 2000; $wyear <= $year; $wyear++){
+        for($wyear = 1999; $wyear <= $year; $wyear++){
                 $name = './Data/data_extracted_'."$wyear";
                 print OUT "<a href='$name'> ASCII Data for year:  $wyear</a><br>","\n";
         }
@@ -391,7 +391,7 @@ sub print_html{
 
         print OUT '<p>Following is ASCII data tables for the data plotted above. The entries are Fits file name,',"\n";
         print OUT ' tstart, tstop, sim_x, sim_y, sim_z, pitchamp, and yawamp.<br><br>',"\n";
-        for($wyear = 2000; $wyear <= $year; $wyear++){
+        for($wyear = 1999; $wyear <= $year; $wyear++){
                 $name = './Data/data_info_'."$wyear";
                 print OUT "<a href='$name'> ASCII Data for year:  $wyear</a><br>","\n";
         }
