@@ -576,9 +576,9 @@ sub plot_data{
 	$ymax_sim_y  = $temp[$icnt -1];
 	$ydiff       = abs($ymax_sim_y - $ymin_sim_y);
 	if($ydiff == 0){
-		$ymin_sim_y =-1;
-		$ymax_sim_y = 1;
-		$ydiff      = 2;
+		$ymin_sim_y =-0.05;
+		$ymax_sim_y = 0.05;
+		$ydiff      = 0.10;
 	}
 	$ymin_sim_y  = $ymin_sim_y - 0.01 * $ydiff;
 	$ymax_sim_y  = $ymax_sim_y + 0.01 * $ydiff;
@@ -601,6 +601,8 @@ sub plot_data{
 	@temp           = sort{$a<=>$b} @pitchamp;
 	$ymin_pitchamp  = $temp[0];
 	$ymax_pitchamp  = $temp[$icnt -3];
+$ymax_pitchamp = 0.02;
+$ymin_pitchamp = 0.0;
 	$ydiff          = abs($ymax_pitchamp - $ymin_pitchamp);
 	$ymin_pitchamp  = $ymin_pitchamp - 0.01 * $ydiff;
 	$ymax_pitchamp  = $ymax_pitchamp + 0.01 * $ydiff;
@@ -612,6 +614,8 @@ sub plot_data{
 	@temp         = sort{$a<=>$b} @yawamp;
 	$ymin_yawamp  = $temp[0];
 	$ymax_yawamp  = $temp[$icnt -3];
+$ymax_yawamp = 0.02;
+$ymin_yawamp = 0.0;
 	$ydiff        = abs($ymax_yawamp - $ymin_yawamp);
 	$ymin_yawamp  = $ymin_yawamp - 0.01 * $ydiff;
 	$ymax_yawamp  = $ymax_yawamp + 0.01 * $ydiff;

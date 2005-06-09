@@ -5,7 +5,7 @@ TASK = Alignment_sim_twist
 
 include /data/mta4/MTA/include/Makefile.MTA
 
-BIN  = alignment_sim_twist_extract.perl alignment_sim_twist_extract_acadata.perl alignment_sim_twist_fid_trend_plots.perl alignment_sim_twist_remove_dupl.perl alignment_sim_twist_wrap_script alignment_sim_twist_main_script alignment_sim_twist_relation_plot.perl
+BIN  = alignment_sim_twist_extract.perl alignment_sim_twist_extract_acadata.perl alignment_sim_twist_fid_trend_plots.perl alignment_sim_twist_remove_dupl.perl alignment_sim_twist_wrap_script alignment_sim_twist_main_script alignment_sim_twist_relation_plot.perl alignment_sim_twist_extract_plot_only.perl
 DOC  = README
 
 install:
