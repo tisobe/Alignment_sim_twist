@@ -376,7 +376,7 @@ sub print_html{
         print OUT 'HRC-I, and HRC-S)<br><br>',"\n";
         print OUT "<img src='./Plots/dtheta_plot.gif' width='600' height='600'>","\n";
 
-        print OUT '<p> Following is ASCII data tables for the data plotted above. The entires are time in seconds from',"\n";
+        print OUT '<p> Followings are ASCII data tables for the data plotted above. The entires are time in seconds from',"\n";
         print OUT ' Jan 1, 1998, dy, dz, and dtheta. All entires are 5 min avaerage.<br><br> ',"\n";
 
         for($wyear = 1999; $wyear <= $year; $wyear++){
@@ -384,12 +384,12 @@ sub print_html{
                 print OUT "<a href='$name'> ASCII Data for year:  $wyear</a><br>","\n";
         }
         print OUT '<p>',"\n";
-        print OUT 'From the same fits file, we also collected sim_x,y, and z postions, pitch amp, and yaw amp of dithers.',"\n";
+        print OUT 'From the same fits files, we also collected sim_x,y, and z postions, pitch amps, and yaw amps of dithers.',"\n";
         print OUT '<br><br>',"\n";
         print OUT "<img src='./Plots/sim_plot.gif' width='600' height='600'>","\n";
         print OUT '<br><br>',"\n";
 
-        print OUT '<p>Following is ASCII data tables for the data plotted above. The entries are Fits file name,',"\n";
+        print OUT '<p>Followings are ASCII data tables for the data plotted above. The entries are Fits file name,',"\n";
         print OUT ' tstart, tstop, sim_x, sim_y, sim_z, pitchamp, and yawamp.<br><br>',"\n";
         for($wyear = 1999; $wyear <= $year; $wyear++){
                 $name = './Data/data_info_'."$wyear";
