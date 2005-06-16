@@ -359,13 +359,14 @@ $out_name2 = 'data_info_'."$year";
 sub print_html{
         open(OUT, '>/data/mta/www/mta_sim_twist/sim_twist.html');
         print OUT '<html>',"\n";
-        print OUT '<BODY TEXT="#FFFFFF" BGCOLOR="#000000" LINK="#00CCFF" VLINK="#B6FFFF" ALINK="#FF0000", background ="./stars.jpg">',"\n";
+#        print OUT '<BODY TEXT="#FFFFFF" BGCOLOR="#000000" LINK="#00CCFF" VLINK="#B6FFFF" ALINK="#FF0000", background ="./stars.jpg">',"\n";
+        print OUT '<BODY TEXT="#FFFFFF" BGCOLOR="#000000" LINK="yellow" VLINK="yellow" ALINK="yellow", background ="./stars.jpg">',"\n";
         print OUT '<h2>SIM Shift and Twist Trends</h2>',"\n";
         print OUT '<p>',"\n";
         print OUT 'This page shows trends of SIM shifts (dy and dz) and twist (dtheta). All quantities are directly taken from',"\n";
-        print OUT 'pcaf*_asol1.fits files. The units are mm for dy and dz, and degree for dtheta.',"\n";
+        print OUT 'pcaf*_asol1.fits files. The units are mm for dy and dz, and second  for dtheta.',"\n";
         print OUT 'We fit two lines separated before and after (Days of Mission)= 1400 (May 21, 2003).',"\n";
-        print OUT 'The unit of slopes are mm per day or degree per day.',"\n";
+        print OUT 'The unit of slopes are mm per day or second per day.',"\n";
         print OUT '<p> The sudden shift around DOM = 1400 was due to fid light drift (see a memo by Aldocroft';
 	print OUT "<a href='http://cxc.harvard.edu/mta/ASPECT/fid_drift/'> fiducial light drfit</a>).","\n";
         print OUT '<br><br>',"\n";
@@ -436,6 +437,7 @@ sub plot_data{
 			chomp $_;
 			@atemp = split(/\s+/, $_);
 			$dom = $atemp[0]/86400 - 567;
+			$atemp[5] * 3600;		#---- changed from degree to second
 			push(@time,   $dom);
 			push(@dy,     $atemp[3]);
 			push(@dz,     $atemp[4]);
@@ -598,10 +600,17 @@ sub plot_data{
 	$ytop_sim_z  = $ymax_sim_z + 0.05 * $ydiff;
 	$ybot_sim_z  = $ymin_sim_z - 0.20 * $ydiff;
 
+	@ptemp = ();
+	foreach $ent (@pitchamp){
+		$temp = 3600 * $ent;
+		push(@ptemp, $temp);
+	}
+	@pitchamp = @ptemp;
+
 	@temp           = sort{$a<=>$b} @pitchamp;
 	$ymin_pitchamp  = $temp[0];
 	$ymax_pitchamp  = $temp[$icnt -3];
-$ymax_pitchamp = 0.02;
+$ymax_pitchamp = 70;
 $ymin_pitchamp = 0.0;
 	$ydiff          = abs($ymax_pitchamp - $ymin_pitchamp);
 	$ymin_pitchamp  = $ymin_pitchamp - 0.01 * $ydiff;
@@ -611,10 +620,17 @@ $ymin_pitchamp = 0.0;
 	$ytop_pitchamp  = $ymax_pitchamp + 0.05 * $ydiff;
 	$ybot_pitchamp  = $ymin_pitchamp - 0.20 * $ydiff;
 
+	@ptemp = ();
+	foreach $ent (@yawamp){
+		$temp = 3600 * $ent;
+		push(@ptemp, $temp);
+	}
+	@yawamp = @ptemp;
+
 	@temp         = sort{$a<=>$b} @yawamp;
 	$ymin_yawamp  = $temp[0];
 	$ymax_yawamp  = $temp[$icnt -3];
-$ymax_yawamp = 0.02;
+$ymax_yawamp = 70;
 $ymin_yawamp = 0.0;
 	$ydiff        = abs($ymax_yawamp - $ymin_yawamp);
 	$ymin_yawamp  = $ymin_yawamp - 0.01 * $ydiff;
@@ -672,7 +688,7 @@ $ymin_yawamp = 0.0;
 	pgswin($xmin, $xmax, $ymin_pitchamp, $ymax_pitchamp);
 	pgbox(ABCST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
 	pgsch(0.8);
-	pgptxt($xside,$ymid_pitchamp, 90.0, 0.5, "pitchamp (degree)");
+	pgptxt($xside,$ymid_pitchamp, 90.0, 0.5, "pitchamp (second)");
 	pgsch(1.0);
 	@ybin = @pitchamp;
 	plot_fig();
@@ -683,7 +699,7 @@ $ymin_yawamp = 0.0;
 	pgswin($xmin, $xmax, $ymin_yawamp, $ymax_yawamp);
 	pgbox(ABCNSTV,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
 	pgsch(0.8);
-	pgptxt($xside,$ymid_yawamp, 90.0, 0.5, "yawamp (degree)");
+	pgptxt($xside,$ymid_yawamp, 90.0, 0.5, "yawamp (second)");
 	pgsch(1.0);
 	@ybin = @yawamp;
 	plot_fig();
@@ -830,14 +846,18 @@ $ymin_yawamp = 0.0;
 #
 		$sum  = 0;
 		$sum2 = 0;
+
 		foreach $ent (@dtheta){
 			$sum  += $ent;
 			$sum2 += $ent * $ent;
 		}
+
 		$avg = $sum/$dcnt;
 		$std = sqrt($sum2/$dcnt - $avg * $avg);
 		$ymin_dtheta = $avg - 3.0 * $std;
 		$ymax_dtheta = $avg + 3.0 * $std;
+$ymin_dtheta = -80;
+$ymax_dtheta =  80;
 		$ydiff       = $ymax_dtheta - $ymin_dtheta;
 		if($ydiff > 0){
 			$ymin_dtheta = $ymin_dtheta - 0.01 * $ydiff;
@@ -978,8 +998,8 @@ $ymin_yawamp = 0.0;
 #	
 #		$ymin = $avg - 0.01;
 #		$ymax = $avg + 0.01;
-		$ymin = -0.01;
-		$ymax =  0.015;
+		$ymin = -80;
+		$ymax =  80;
         	$ydiff      = $ymax - $ymin;
 
         	$ymid  = $ymin + 0.50 * $ydiff;
@@ -1025,8 +1045,8 @@ $ymin_yawamp = 0.0;
 #	
 #		$ymin = $avg - 0.01;
 #		$ymax = $avg + 0.01;
-		$ymin = -0.01;
-		$ymax =  0.015;
+		$ymin = -80;
+		$ymax =  80;
         	$ydiff      = $ymax - $ymin;
 
         	$ymid  = $ymin + 0.50 * $ydiff;
@@ -1073,8 +1093,8 @@ $ymin_yawamp = 0.0;
 #	
 #		$ymin = $avg - 0.01;
 #		$ymax = $avg + 0.01;
-		$ymin = -0.01;
-		$ymax =  0.015;
+		$ymin = -80;
+		$ymax =  80;
         	$ydiff      = $ymax - $ymin;
 
         	$ymid  = $ymin + 0.50 * $ydiff;
@@ -1121,8 +1141,8 @@ $ymin_yawamp = 0.0;
 #	
 #		$ymin = $avg - 0.01;
 #		$ymax = $avg + 0.01;
-		$ymin = -0.01;
-		$ymax =  0.015;
+		$ymin = -80;
+		$ymax =  80;
         	$ydiff      = $ymax - $ymin;
 
         	$ymid  = $ymin + 0.50 * $ydiff;

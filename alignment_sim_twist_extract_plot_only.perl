@@ -48,6 +48,7 @@ sub plot_data{
 			chomp $_;
 			@atemp = split(/\s+/, $_);
 			$dom = $atemp[0]/86400 - 567;
+			$atemp[5] *= 3600;
 			push(@time,   $dom);
 			push(@dy,     $atemp[3]);
 			push(@dz,     $atemp[4]);
@@ -209,11 +210,18 @@ sub plot_data{
 	$yside_sim_z = $ymin_sim_z + 0.50 * $ydiff;
 	$ytop_sim_z  = $ymax_sim_z + 0.05 * $ydiff;
 	$ybot_sim_z  = $ymin_sim_z - 0.20 * $ydiff;
+	
+	@ptemp = ();
+	foreach $ent (@pitchamp){
+		$ent += 3600;	
+		push(@ptemp, $ent);
+	}
+	@pitchamp = @ptemp;
 
 	@temp           = sort{$a<=>$b} @pitchamp;
 	$ymin_pitchamp  = $temp[0];
 	$ymax_pitchamp  = $temp[$icnt -10];
-$ymax_pitchamp = 0.02;
+$ymax_pitchamp = 70;
 $ymin_pitchamp = 0.0;
 	$ydiff          = abs($ymax_pitchamp - $ymin_pitchamp);
 	$ymin_pitchamp  = $ymin_pitchamp - 0.01 * $ydiff;
@@ -223,10 +231,17 @@ $ymin_pitchamp = 0.0;
 	$ytop_pitchamp  = $ymax_pitchamp + 0.05 * $ydiff;
 	$ybot_pitchamp  = $ymin_pitchamp - 0.20 * $ydiff;
 
+	@ptemp = ();
+	foreach $ent (@yawamp){
+		$ent += 3600;	
+		push(@ptemp, $ent);
+	}
+	@yawamp = @ptemp;
+
 	@temp         = sort{$a<=>$b} @yawamp;
 	$ymin_yawamp  = $temp[0];
 	$ymax_yawamp  = $temp[$icnt -10];
-$ymax_yawamp = 0.02;
+$ymax_yawamp = 70;
 $ymin_yawamp = 0.0;
 	$ydiff        = abs($ymax_yawamp - $ymin_yawamp);
 	$ymin_yawamp  = $ymin_yawamp - 0.01 * $ydiff;
@@ -284,7 +299,7 @@ $ymin_yawamp = 0.0;
 	pgswin($xmin, $xmax, $ymin_pitchamp, $ymax_pitchamp);
 	pgbox(ABCST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
 	pgsch(0.8);
-	pgptxt($xside,$ymid_pitchamp, 90.0, 0.5, "pitchamp (degree)");
+	pgptxt($xside,$ymid_pitchamp, 90.0, 0.5, "pitchamp (second)");
 	pgsch(1.0);
 	@ybin = @pitchamp;
 	plot_fig();
@@ -295,7 +310,7 @@ $ymin_yawamp = 0.0;
 	pgswin($xmin, $xmax, $ymin_yawamp, $ymax_yawamp);
 	pgbox(ABCNSTV,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
 	pgsch(0.8);
-	pgptxt($xside,$ymid_yawamp, 90.0, 0.5, "yawamp (degree)");
+	pgptxt($xside,$ymid_yawamp, 90.0, 0.5, "yawamp (second)");
 	pgsch(1.0);
 	@ybin = @yawamp;
 	plot_fig();
@@ -303,8 +318,8 @@ $ymin_yawamp = 0.0;
 	pgptxt($xmin,$ybot_yawamp, 0.0, 1.0, "Time (DOM)");
 	pgclos();
 
-	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/sim_plot.gif");
-###	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./Plots/sim_plot.gif");
+###	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/sim_plot.gif");
+	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./Plots/sim_plot.gif");
 
 #
 #---- sim twist plot starts here
@@ -442,14 +457,19 @@ $ymin_yawamp = 0.0;
 #
 		$sum  = 0;
 		$sum2 = 0;
+		@dtemp = ();
+
 		foreach $ent (@dtheta){
 			$sum  += $ent;
 			$sum2 += $ent * $ent;
 		}
+
 		$avg = $sum/$dcnt;
 		$std = sqrt($sum2/$dcnt - $avg * $avg);
 		$ymin_dtheta = $avg - 3.0 * $std;
 		$ymax_dtheta = $avg + 3.0 * $std;
+$ymin_dtheta = -80;
+$ymax_dtheta =  80;
 		$ydiff       = $ymax_dtheta - $ymin_dtheta;
 		if($ydiff > 0){
 			$ymin_dtheta = $ymin_dtheta - 0.01 * $ydiff;
@@ -535,7 +555,7 @@ $ymin_yawamp = 0.0;
 	pgsvp(0.1, 0.95, 0.16,0.41);
 	pgswin($xmin, $xmax, $ymin_dtheta, $ymax_dtheta);
 	pgbox(ABCNSTV,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
-	pgptxt($xside,$ymid_dtheta, 90.0, 0.5, "dtheta (deg)");
+	pgptxt($xside,$ymid_dtheta, 90.0, 0.5, "dtheta (second)");
 	@ybin = @dtheta;
 	plot_fig();
 	pgsci(3);
@@ -552,8 +572,8 @@ $ymin_yawamp = 0.0;
 	pgptxt($xmid,$ybot_dtheta, 0.0, 0.5, "Time (DOM)");
 	pgclos();
 
-	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/twist_plot.gif");
-###	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./Plots/twist_plot.gif");
+###	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/twist_plot.gif");
+	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./Plots/twist_plot.gif");
 	system("rm ./Sim_twist_temp/pgplot.ps");
 
 #
@@ -590,8 +610,8 @@ $ymin_yawamp = 0.0;
 	
 		$ymin = $avg - 0.01;
 		$ymax = $avg + 0.01;
-$ymin = -0.01;
-$ymax = 0.015;
+$ymin = -80;
+$ymax =  80;
         	$ydiff      = $ymax - $ymin;
 
         	$ymid  = $ymin + 0.50 * $ydiff;
@@ -602,7 +622,7 @@ $ymax = 0.015;
         	pgsvp(0.15, 0.98, $pst[$pnl_cnt], $ped[$pnl_cnt]);
         	pgswin($xmin, $xmax, $ymin, $ymax);
 		pgbox(ABCST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
-        	pgptxt($xside2,$ymid, 90.0, 0.5, "dtheta (deg)");
+        	pgptxt($xside2,$ymid, 90.0, 0.5, "dtheta (second)");
 	
 		@xbin  = @dm_a_i;
 		@ybin  = @dt_a_i;
@@ -637,8 +657,8 @@ $ymax = 0.015;
 	
 		$ymin = $avg - 0.01;
 		$ymax = $avg + 0.01;
-$ymin = -0.01;
-$ymax = 0.015;
+$ymin = -80;
+$ymax =  80;
         	$ydiff      = $ymax - $ymin;
 
         	$ymid  = $ymin + 0.50 * $ydiff;
@@ -654,7 +674,7 @@ $ymax = 0.015;
         	pgsvp(0.15, 0.98, $pst[$pnl_cnt], $ped[$pnl_cnt]);
         	pgswin($xmin, $xmax, $ymin, $ymax);
 		pgbox(ABCST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
-        	pgptxt($xside2,$ymid, 90.0, 0.5, "dtheta (deg)");
+        	pgptxt($xside2,$ymid, 90.0, 0.5, "dtheta (second)");
 	
         	plot_fig();
 	
@@ -685,8 +705,8 @@ $ymax = 0.015;
 	
 		$ymin = $avg - 0.01;
 		$ymax = $avg + 0.01;
-$ymin = -0.01;
-$ymax = 0.015;
+$ymin = -80;
+$ymax =  80;
         	$ydiff      = $ymax - $ymin;
 
         	$ymid  = $ymin + 0.50 * $ydiff;
@@ -702,7 +722,7 @@ $ymax = 0.015;
         	pgsvp(0.15, 0.98, $pst[$pnl_cnt], $ped[$pnl_cnt]);
         	pgswin($xmin, $xmax, $ymin, $ymax);
 		pgbox(ABCST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
-        	pgptxt($xside2, $ymid, 90.0, 0.5, "dtheta (deg)");
+        	pgptxt($xside2, $ymid, 90.0, 0.5, "dtheta (second)");
 	
         	plot_fig();
 	
@@ -733,8 +753,8 @@ $ymax = 0.015;
 	
 		$ymin = $avg - 0.01;
 		$ymax = $avg + 0.01;
-$ymin = -0.01;
-$ymax = 0.015;
+$ymin = -80;
+$ymax =  80;
         	$ydiff      = $ymax - $ymin;
 
         	$ymid  = $ymin + 0.50 * $ydiff;
@@ -751,7 +771,7 @@ $ymax = 0.015;
         	pgsvp(0.15, 0.98, $pst[$pnl_cnt], $ped[$pnl_cnt]);
         	pgswin($xmin, $xmax, $ymin, $ymax);
 		pgbox(ABCNST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
-        	pgptxt($xside2,$ymid, 90.0, 0.5, "dtheta (deg)");
+        	pgptxt($xside2,$ymid, 90.0, 0.5, "dtheta (second)");
 	
         	plot_fig();
 	
@@ -769,8 +789,8 @@ $ymax = 0.015;
 	pgptxt($xmin, $ybot2, 0.0, 1.0, "Time(DOM)");
 	pgclos();
 	
-    	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/dtheta_plot.gif");
-###       	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./Plots/dtheta_plot.gif");
+###    	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/dtheta_plot.gif");
+       	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./Plots/dtheta_plot.gif");
 
 }
 
