@@ -4,3 +4,4 @@ perl /data/mta4/MTA/bin/alignment_sim_twist_extract_plot_only.perl
 perl /data/mta4/MTA/bin/alignment_sim_twist_extract_acadata.perl
 perl /data/mat4/MTA/bin/alignment_sim_twist_remove_dupl.perl
 perl /data/mta4/MTA/bin/alignment_sim_twist_fid_trend_plots.perl
+perl /data/mta4/MTA/bin/alignment_sim_twist_update_html.perl
