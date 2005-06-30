@@ -31,8 +31,8 @@ open(OUT, ">./date_file");
 print OUT "\n$line\n";
 close(OUT);
 
-system("cat $twist_www/$house_keeping/fid_light_drift.html ./date_file > $twist_www/fid_light_drift.html");
-system("cat $twist_www/$house_keeping/sim_twist.html ./date_file > $twist_www/sim_twist.html");
+system("cat $twist_www/house_keeping/fid_light_drift.html ./date_file > $twist_www/fid_light_drift.html");
+system("cat $twist_www/house_keeping/sim_twist.html ./date_file > $twist_www/sim_twist.html");
 
 system("rm ./date_file");
 
