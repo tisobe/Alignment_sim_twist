@@ -31,6 +31,31 @@ open(OUT, ">./date_file");
 print OUT "\n$line\n";
 close(OUT);
 
+$lyear     = $year -1;
+$last_year = 'sim_twist_'."$lyear".'.html';
+$this_year = 'sim_twist_'."$year".'.html';
+
+$check = `ls /data/mta/www/mta_sim_twsit/*html`;
+if($check !~ /$this_year/){
+	open(FH,  "/data/mta/www/mta_sim_twist/$last_year");
+	open(OUT, ">/data/mta/www/mta_sim_twist/$this_year");
+	while(<FH>){
+		chomp $_;
+		$line = $_;
+		$line =~ s/$last_year/$this_year/g;
+		print OUT "$line\n";
+	}
+	close(OUT);
+	close(FH);
+	for($qtr = 0; $qtr < 4; $qtr++){
+		$file1 = 'twist_plot_'."$this_year".'_'."$qtr".'.gif';
+		$file2 = 'dtheta_plot_'."$this_year".'_'."$qtr".'.gif';
+		system("cp /data/mta/www/mta_sim_twist/no_data.gif /data/mta/mta_sim_twist/$file1");
+		system("cp /data/mta/www/mta_sim_twist/no_data.gif /data/mta/mta_sim_twist/$file2");
+	}
+}
+	
+
 system("cat $twist_www/house_keeping/fid_light_drift.html ./date_file > $twist_www/fid_light_drift.html");
 system("cat $twist_www/house_keeping/sim_twist.html ./date_file > $twist_www/sim_twist.html");
 

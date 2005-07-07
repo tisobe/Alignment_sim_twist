@@ -11,6 +11,24 @@ use PGPLOT;
 #											#
 #########################################################################################
 
+$ year = $ARGV[0];
+chomp $year;
+if($year eq ''){
+#
+#----  update the html page
+#
+
+        ($usec, $umin, $uhour, $umday, $umon, $uyear, $uwday, $uyday, $uisdst)= localtime(time);
+
+        $year  = 1900   + $uyear;
+        $month = $umon  + 1;
+
+        $line = "<br><H3> Last Update: $month/$umday/$year</H3>";
+}
+
+	$input_file = 'data_extracted_'."$year";
+	$input_file2 = 'data_info_'."$year";
+
 
 $test = `ls -d`;
 if($test !~ /Sim_twist_temp/){
@@ -27,8 +45,7 @@ system("rm ./Sim_twist_temp");
 
 sub plot_data{
 
-	$in_list = `ls /data/mta/www/mta_sim_twist//Data/data_extracted_*`;
-###	$in_list = `ls ./Data/data_extracted_*`;
+	$in_list = `ls /data/mta/www/mta_sim_twist//Data/$input_file`;
 	@data_file = split(/\s+/, $in_list);
 
 	@time   = ();
@@ -53,27 +70,32 @@ sub plot_data{
 		while(<FH>){
 			chomp $_;
 			@atemp = split(/\s+/, $_);
-			$dom = $atemp[0]/86400 - 567;
+			$add = 0;
+			if($year > 2000){
+        			$add = int(0.25 * ($year - 2001)) + 1;
+			}
+			$sub = 365 * ($year - 1998) + $add;
+			$doy = $atemp[0]/86400 - $sub;
 			$atemp[5] *= 3600;
-			push(@time,   $dom);
+			push(@time,   $doy);
 			push(@dy,     $atemp[3]);
 			push(@dz,     $atemp[4]);
 			push(@dtheta, $atemp[5]);
 			if($atemp[2] =~ /ACIS-I/i){
 				push(@dt_a_i, $atemp[5]);
-				push(@dm_a_i, $dom);
+				push(@dm_a_i, $doy);
 				$dn_a_i++;
 			}elsif($atemp[2] =~ /ACIS-S/i){
 				push(@dt_a_s, $atemp[5]);
-				push(@dm_a_s, $dom);
+				push(@dm_a_s, $doy);
 				$dn_a_s++;
 			}elsif($atemp[2] =~ /HRC-I/i){
 				push(@dt_h_i, $atemp[5]);
-				push(@dm_h_i, $dom);
+				push(@dm_h_i, $doy);
 				$dn_h_i++;
 			}elsif($atemp[2] =~ /HRC-S/i){
 				push(@dt_h_s, $atemp[5]);
-				push(@dm_h_s, $dom);
+				push(@dm_h_s, $doy);
 				$dn_h_s++;
 			}
 			$dcnt++;
@@ -81,7 +103,7 @@ sub plot_data{
 		close(FH);
 	}
 
-	$in_list = `ls /data/mta/www/mta_sim_twist//Data/data_info_*`;
+	$in_list = `ls /data/mta/www/mta_sim_twist//Data/$input_file2`;
 ###	$in_list = `ls ./Data/data_info_*`;
 	@data_file = split(/\s+/, $in_list);
 
@@ -321,22 +343,57 @@ $ymin_yawamp = 0.0;
 	@ybin = @yawamp;
 	plot_fig();
 
-	pgptxt($xmin,$ybot_yawamp, 0.0, 1.0, "Time (DOM)");
+	pgptxt($xmin,$ybot_yawamp, 0.0, 1.0, "Time (DOY)");
 	pgclos();
 
-	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/sim_plot.gif");
+###	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/sim_plot_$year.gif");
 ###	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./Plots/sim_plot.gif");
 
 #
 #---- sim twist plot starts here
 #
 	
-	@xbin        = @time;
-	$xmin        = $time[0];
-	$xmax        = $time[$dcnt -1];
+OUTER:
+for($qtr = 0; $qtr < 4; $qtr++){
+	if($qtr == 0){
+		$qstart = 0;
+		$qstop  = 90;
+	}elsif($qtr == 1){
+		$qstart = 91;
+		$qstop  = 181;
+	}elsif($qtr == 2){
+		$qstart = 182;
+		$qstop  = 273;
+	}elsif($qtr ==3){
+		$qstart = 274;
+		$qstop  = 365;
+	}
+
+	@qtime   = ();
+	@qdy     = ();
+	@qdz     = ();
+	@qdtheta = ();
+	$qcnt    = 0;
+	for($i = 0; $i < $dcnt; $i++){
+		if($time[$i] >= $qstart && $time[$i] <= $qstop){
+			push(@qtime, $time[$i]);
+			push(@qdy,   $dy[$i]);
+			push(@qdz,   $dz[$i]);
+			push(@qdtheta, $dtheta[$i]);
+			$qcnt++;
+		}
+	}
+	if($qcnt == 0){
+		next OUTER;
+	}
+	@xbin        = @qtime;
+	$xmin        = $qtime[0];
+	$xmax        = $qtime[$qdcnt -1];
+	$xhalf       = 0.5 * ($xmax + $xmin);
 	$xdiff       = $xmax - $xmin;
 	$xmid  	     = $xmin + 0.50 * $xdiff;
 	$xside       = $xmin - 0.08 * $xdiff;
+	$xside2      = $xmin - 0.12 * $xdiff;
 
 	$ymin_dy     = -0.1;
 	$ymax_dy     =  0.1;
@@ -352,12 +409,12 @@ $ymin_yawamp = 0.0;
 #
 		$sum  = 0;
 		$sum2 = 0;
-		foreach $ent (@dy){
+		foreach $ent (@qdy){
 			$sum  += $ent;
 			$sum2 += $ent * $ent;
 		}
-		$avg = $sum/$dcnt;
-		$std = sqrt($sum2/$dcnt - $avg * $avg);
+		$avg = $sum/$qcnt;
+		$std = sqrt($sum2/$qcnt - $avg * $avg);
 		$ymin_dy = $avg - 3.0 * $std;
 		$ymax_dy = $avg + 3.0 * $std;
 		$ydiff   = abs($ymax_dy - $ymin_dy);
@@ -370,38 +427,14 @@ $ymin_yawamp = 0.0;
 		$ytop_dy      = $ymax_dy + 0.05 * $ydiff;
 		$ybot_dy      = $ymin_dy - 0.20 * $ydiff;
 
-		@plotx1 = ();
-		@ploty1 = ();
-		@plotx2 = ();
-		@ploty2 = ();
-		$pcnt1  = 0;
-		$pcnt2  = 0;
-		for($i = 0; $i < $dcnt; $i++){
-			if($time[$i] < 1400){
-				push(@plotx1, $time[$i]);
-				push(@ploty1, $dy[$i]);
-				$pcnt1++;
-			}else{
-				push(@plotx2, $time[$i]);
-				push(@ploty2, $dy[$i]);
-				$pcnt2++;
-			}
-		}
-		@xbin  = @plotx1;
-		@ybin  = @ploty1;
-		$total = $pcnt1;
+		@xbin  = @qtime;
+		@ybin  = @qdy;
+		$total = $qcnt;
 		least_fit();
 		$dy_int1   = $s_int;
 		$dy_slope1 = $slope;
 		$dy_disp1 = sprintf "%4.3e", $slope;
-
-		@xbin  = @plotx2;
-		@ybin  = @ploty2;
-		$total = $pcnt2;
-		least_fit();
-		$dy_int2   = $s_int;
-		$dy_slope2 = $slope;
-		$dy_disp2 = sprintf "%4.3e", $slope;
+		
 #
 #------ dz
 #
@@ -425,38 +458,13 @@ $ymin_yawamp = 0.0;
 		$ytop_dz      = $ymax_dz + 0.05 * $ydiff;
 		$ybot_dz      = $ymin_dz - 0.20 * $ydiff;
 
-		@plotx1 = ();
-		@ploty1 = ();
-		@plotx2 = ();
-		@ploty2 = ();
-		$pcnt1  = 0;
-		$pcnt2  = 0;
-		for($i = 0; $i < $dcnt; $i++){
-			if($time[$i] < 1400){
-				push(@plotx1, $time[$i]);
-				push(@ploty1, $dz[$i]);
-				$pcnt1++;
-			}else{
-				push(@plotx2, $time[$i]);
-				push(@ploty2, $dz[$i]);
-				$pcnt2++;
-			}
-		}
-		@xbin  = @plotx1;
-		@ybin  = @ploty1;
-		$total = $pcnt1;
+		@xbin  = @qtime;
+		@ybin  = @qdz;
+		$total = $qcnt;
 		least_fit();
 		$dz_int1   = $s_int;
 		$dz_slope1 = $slope;
 		$dz_disp1 = sprintf "%4.3e", $slope;
-
-		@xbin  = @plotx2;
-		@ybin  = @ploty2;
-		$total = $pcnt2;
-		least_fit();
-		$dz_int2   = $s_int;
-		$dz_slope2 = $slope;
-		$dz_disp2 = sprintf "%4.3e", $slope;
 
 #
 #----- dtheta
@@ -464,17 +472,13 @@ $ymin_yawamp = 0.0;
 		$sum  = 0;
 		$sum2 = 0;
 
-		foreach $ent (@dtheta){
+		foreach $ent (@qdtheta){
 			$sum  += $ent;
 			$sum2 += $ent * $ent;
 		}
 
-		$avg = $sum/$dcnt;
-		$std = sqrt($sum2/$dcnt - $avg * $avg);
-		$ymin_dtheta = $avg - 3.0 * $std;
-		$ymax_dtheta = $avg + 3.0 * $std;
-$ymin_dtheta = -80;
-$ymax_dtheta =  80;
+		$ymin_dtheta = -50;
+		$ymax_dtheta =  50;
 		$ydiff       = $ymax_dtheta - $ymin_dtheta;
 		if($ydiff > 0){
 			$ymin_dtheta = $ymin_dtheta - 0.01 * $ydiff;
@@ -485,9 +489,9 @@ $ymax_dtheta =  80;
 		$ytop_dtheta  = $ymax_dtheta + 0.05 * $ydiff;
 		$ybot_dtheta  = $ymin_dtheta - 0.20 * $ydiff;
 
-		@xbin  = @time;
-		@ybin  = @dtheta;
-		$total = $dcnt;
+		@xbin  = @qtime;
+		@ybin  = @qdtheta;
+		$total = $qcnt;
 		least_fit();
 		$dtheta_int   = $s_int;
 		$dtheta_slope = $slope;
@@ -508,25 +512,19 @@ $ymax_dtheta =  80;
 	pgswin($xmin, $xmax, $ymin_dy, $ymax_dy);
 	pgbox(ABCST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
 	pgptxt($xside,$ymid_dy, 90.0, 0.5, "dy (mm)");
-	@ybin = @dy;
+	@ybin = @qdy;
 	plot_fig();
 
 	pgsci(3);
 	$ymin = $dy_int1 + $dy_slope1 * $xmin;
-	$ymax = $dy_int1 + $dy_slope1 * 1400;
+	$ymax = $dy_int1 + $dy_slope1 * $xmax;
 	pgmove($xmin, $ymin);
-	pgdraw(1400, $ymax);
-	$ymin = $dy_int2 + $dy_slope2 * 1400;
-	$ymax = $dy_int2 + $dy_slope2 * $xmax;
-	pgmove(1400, $ymin);
 	pgdraw($xmax, $ymax);
 	pgsci(1);
 	$xdpos = $xmin + 0.04 * $xdiff;
 	$diff  = $ymax_dy - $ymin_dy;
 	$ytop1 = $ymax_dy - 0.10 * $diff; 
-	$ytop2 = $ymax_dy - 0.20 * $diff; 
-	pgptxt($xdpos,$ytop1, 0.0, 0.0, "Slope (dom < 1400): $dy_disp1");
-	pgptxt($xdpos,$ytop2, 0.0, 0.0, "Slope (dom > 1400): $dy_disp2");
+	pgptxt($xdpos,$ytop1, 0.0, 0.0, "Slope: $dy_disp1");
 
 	$color = 2;
 
@@ -534,25 +532,19 @@ $ymax_dtheta =  80;
 	pgswin($xmin, $xmax, $ymin_dz, $ymax_dz);
 	pgbox(ABCST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
 	pgptxt($xside,$ymid_dz, 90.0, 0.5, "dz (mm)");
-	@ybin = @dz;
+	@ybin = @qdz;
 	plot_fig();
 
 	pgsci(3);
 	$ymin = $dz_int1 + $dz_slope1 * $xmin;
-	$ymax = $dz_int1 + $dz_slope1 * 1400;
+	$ymax = $dz_int1 + $dz_slope1 * $xmax;
 	pgmove($xmin, $ymin);
-	pgdraw(1400, $ymax);
-	$ymin = $dz_int2 + $dz_slope2 * 1400;
-	$ymax = $dz_int2 + $dz_slope2 * $xmax;
-	pgmove(1400, $ymin);
 	pgdraw($xmax, $ymax);
 	pgsci(1);
 	$xdpos = $xmin + 0.04 * $xdiff;
 	$diff  = $ymax_dz - $ymin_dz;
 	$ytop1 = $ymax_dz - 0.10 * $diff; 
-	$ytop2 = $ymax_dz - 0.20 * $diff; 
-	pgptxt($xdpos,$ytop1, 0.0, 0.0, "Slope (dom < 1400): $dz_disp1");
-	pgptxt($xdpos,$ytop2, 0.0, 0.0, "Slope (dom > 1400): $dz_disp2");
+	pgptxt($xdpos,$ytop1, 0.0, 0.0, "Slope: $dz_disp1");
 
 
 	$color = 2;
@@ -561,7 +553,7 @@ $ymax_dtheta =  80;
 	pgswin($xmin, $xmax, $ymin_dtheta, $ymax_dtheta);
 	pgbox(ABCNSTV,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
 	pgptxt($xside,$ymid_dtheta, 90.0, 0.5, "dtheta (second)");
-	@ybin = @dtheta;
+	@ybin = @qdtheta;
 	plot_fig();
 	pgsci(3);
 	$ymin = $dtheta_int + $dtheta_slope * $xmin;
@@ -574,10 +566,11 @@ $ymax_dtheta =  80;
 	$ytop1 = $ymax_dtheta - 0.10 * $diff; 
 	pgptxt($xdpos,$ytop1, 0.0, 0.0, "Slope: $dtheta_disp");
 
-	pgptxt($xmid,$ybot_dtheta, 0.0, 0.5, "Time (DOM)");
+	pgptxt($xmid,$ybot_dtheta, 0.0, 0.5, "Time (DOY)");
 	pgclos();
 
-	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/twist_plot.gif");
+	$name = 'twist_plot_'."$year".'_'."$qtr".'.gif';
+	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/$name");
 ###	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./Plots/twist_plot.gif");
 	system("rm ./Sim_twist_temp/pgplot.ps");
 
@@ -603,20 +596,39 @@ $ymax_dtheta =  80;
 #----- ACIS-I
 
 	if($dn_a_i > 0){
-        	@xdata  = @dm_a_i;
-        	@ydata  = @dt_a_i;
-        	$data_cnt = $dn_a_i;
-        	robust_fit();
-        	$dt_int   = $int;
-        	$dt_slope = $slope;
-        	$dt_disp  = sprintf "%4.3e", $slope;
+		@xdata    = ();
+		@ydata    = ();
+		$data_cnt = 0;
+		for($i = 0; $i < $dn_a_i; $i++){
+			if($dm_a_i[$i] > $qstart && $dm_a_i[$i] < $qstop){
+        			push(@xdata, $dm_a_i[$i]);
+        			push(@ydata, $dt_a_i[$i]);
+        			$data_cnt++;
+			}
+		}
+		$total = $data_cnt;
 
-		$avg = $int + $slope * $xbin[$data_cnt/2];
+		if($total > 0){
+        		robust_fit();
+        		$dt_int   = $int;
+        		$dt_slope = $slope;
+        		$dt_disp  = sprintf "%4.3e", $slope;
 	
-		$ymin = $avg - 15;
-		$ymax = $avg + 15;
-#$ymin = -80;
-#$ymax =  80;
+			$avg = 0;
+			foreach $ent (@ydata){
+				$avg += $ent;
+			}
+			$avg = $int + $slope * $xhalf;
+			#$avg /= $data_cnt;
+		}else{
+			$avg = -7;
+        		$dt_int   = -999;
+        		$dt_slope = -999;
+        		$dt_disp  = 'Indef';
+		}
+	
+		$ymin = $avg - 10;
+		$ymax = $avg + 10;
         	$ydiff      = $ymax - $ymin;
 
         	$ymid  = $ymin + 0.50 * $ydiff;
@@ -627,11 +639,10 @@ $ymax_dtheta =  80;
         	pgsvp(0.15, 0.98, $pst[$pnl_cnt], $ped[$pnl_cnt]);
         	pgswin($xmin, $xmax, $ymin, $ymax);
 		pgbox(ABCST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
-        	pgptxt($xside2,$ymid, 90.0, 0.5, "dtheta (second)");
+        	pgptxt($xside,$ymid, 90.0, 0.5, "dtheta (second)");
 	
-		@xbin  = @dm_a_i;
-		@ybin  = @dt_a_i;
-		$total = $dn_a_i;
+		@xbin  = @xdata;
+		@ybin  = @ydata;
 
         	plot_fig();
 	
@@ -650,20 +661,38 @@ $ymax_dtheta =  80;
 #----- ACIS-S
 
 	if($dn_a_s > 0){
-        	@xdata  = @dm_a_s;
-        	@ydata  = @dt_a_s;
-        	$data_cnt = $dn_a_s;
-        	robust_fit();
-        	$dt_int   = $int;
-        	$dt_slope = $slope;
-        	$dt_disp  = sprintf "%4.3e", $slope;
-
-		$avg = $int + $slope * $xbin[$data_cnt/2];
+		@xdata    = ();
+		@ydata    = ();
+		$data_cnt = 0;
+		for($i = 0; $i < $dn_a_s; $i++){
+			if($dm_a_s[$i] > $qstart && $dm_a_s[$i] < $qstop){
+        			push(@xdata, $dm_a_s[$i]);
+        			push(@ydata, $dt_a_s[$i]);
+        			$data_cnt++;
+			}
+		}
+		$total = $data_cnt;
+		if($total > 0){
+        		robust_fit();
+        		$dt_int   = $int;
+        		$dt_slope = $slope;
+        		$dt_disp  = sprintf "%4.3e", $slope;
 	
-		$ymin = $avg - 15;
-		$ymax = $avg + 15;
-#$ymin = -80;
-#$ymax =  80;
+			$avg = 0;
+			foreach $ent (@ydata){
+				$avg += $ent;
+			}
+			$avg = $int + $slope * $xhalf;
+			#$avg /= $data_cnt;
+		}else{
+			$avg = -15;
+        		$dt_int   = -999;
+        		$dt_slope = -999;
+        		$dt_disp  = 'Indef';
+		}
+	
+		$ymin = $avg - 10;
+		$ymax = $avg + 10;
         	$ydiff      = $ymax - $ymin;
 
         	$ymid  = $ymin + 0.50 * $ydiff;
@@ -672,14 +701,14 @@ $ymax_dtheta =  80;
         	$ybot  = $ymin + 0.20 * $ydiff;
         	$ytop1 = $ymax - 0.10 * $ydiff;
 	
-        	@xbin  = @dm_a_s;
-        	@ybin  = @dt_a_s;
-        	$total = $dn_a_s;
 	
         	pgsvp(0.15, 0.98, $pst[$pnl_cnt], $ped[$pnl_cnt]);
         	pgswin($xmin, $xmax, $ymin, $ymax);
 		pgbox(ABCST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
-        	pgptxt($xside2,$ymid, 90.0, 0.5, "dtheta (second)");
+        	pgptxt($xside,$ymid, 90.0, 0.5, "dtheta (second)");
+	
+		@xbin  = @xdata;
+		@ybin  = @ydata;
 	
         	plot_fig();
 	
@@ -698,20 +727,38 @@ $ymax_dtheta =  80;
 #-----  HRC-I
 
 	if($dn_h_i > 0){
-        	@xdata  = @dm_h_i;
-        	@ydata  = @dt_h_i;
-        	$data_cnt = $dn_h_i;
-        	robust_fit();
-        	$dt_int   = $int;
-        	$dt_slope = $slope;
-        	$dt_disp  = sprintf "%4.3e", $slope;
-
-		$avg = $int + $slope * $xbin[$data_cnt/2];
+		@xdata    = ();
+		@ydata    = ();
+		$data_cnt = 0;
+		for($i = 0; $i < $dn_a_i; $i++){
+			if($dm_h_i[$i] > $qstart && $dm_h_i[$i] < $qstop){
+        			push(@xdata, $dm_h_i[$i]);
+        			push(@ydata, $dt_h_i[$i]);
+        			$data_cnt++;
+			}
+		}
+		$total = $data_cnt;
+		if($total > 0){
+        		robust_fit();
+        		$dt_int   = $int;
+        		$dt_slope = $slope;
+        		$dt_disp  = sprintf "%4.3e", $slope;
 	
-		$ymin = $avg - 15;
-		$ymax = $avg + 15;
-#$ymin = -80;
-#$ymax =  80;
+			$avg = 0;
+			foreach $ent (@ydata){
+				$avg += $ent;
+			}
+			$avg = $int + $slope * $xhalf;
+			#$avg /= $data_cnt;
+		}else{
+			$avg = 30;
+        		$dt_int   = -999;
+        		$dt_slope = -999;
+        		$dt_disp  = 'Indef';
+		}
+
+		$ymin = $avg - 10;
+		$ymax = $avg + 10;
         	$ydiff      = $ymax - $ymin;
 
         	$ymid  = $ymin + 0.50 * $ydiff;
@@ -720,14 +767,14 @@ $ymax_dtheta =  80;
         	$ybot  = $ymin + 0.20 * $ydiff;
         	$ytop1 = $ymax - 0.10 * $ydiff;
 	
-        	@xbin  = @dm_h_i;
-        	@ybin  = @dt_h_i;
-        	$total = $dn_h_i;
 	
         	pgsvp(0.15, 0.98, $pst[$pnl_cnt], $ped[$pnl_cnt]);
         	pgswin($xmin, $xmax, $ymin, $ymax);
 		pgbox(ABCST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
-        	pgptxt($xside2, $ymid, 90.0, 0.5, "dtheta (second)");
+        	pgptxt($xside, $ymid, 90.0, 0.5, "dtheta (second)");
+	
+		@xbin  = @xdata;
+		@ybin  = @ydata;
 	
         	plot_fig();
 	
@@ -746,20 +793,35 @@ $ymax_dtheta =  80;
 #-----  HRC-S
 
 	if($dn_h_s > 0){
-        	@xdata  = @dm_h_s;
-        	@ydata  = @dt_h_s;
-        	$data_cnt = $dn_h_s;
-        	robust_fit();
-        	$dt_int   = $int;
-        	$dt_slope = $slope;
-        	$dt_disp  = sprintf "%4.3e", $slope;
-
-		$avg = $int + $slope * $xbin[$data_cnt/2];
+		@xdata    = ();
+		@ydata    = ();
+		$data_cnt = 0;
+		for($i = 0; $i < $dn_h_s; $i++){
+			if($dm_h_s[$i] > $qstart && $dm_h_s[$i] < $qstop){
+        			push(@xdata, $dm_h_s[$i]);
+        			push(@ydata, $dt_h_s[$i]);
+        			$data_cnt++;
+			}
+		}
+		$total = $data_cnt;
+		if($total > 0){
+        		robust_fit();
+        		$dt_int   = $int;
+        		$dt_slope = $slope;
+        		$dt_disp  = sprintf "%4.3e", $slope;
 	
-		$ymin = $avg - 15;
-		$ymax = $avg + 15;
-#$ymin = -80;
-#$ymax =  80;
+			$avg = 0;
+			foreach $ent (@ydata){
+				$avg += $ent;
+			}
+			$avg = $int + $slope * $xhalf;
+			#$avg /= $data_cnt;
+		}else{
+			$avg = -10;
+		}
+	
+		$ymin = $avg - 10;
+		$ymax = $avg + 10;
         	$ydiff      = $ymax - $ymin;
 
         	$ymid  = $ymin + 0.50 * $ydiff;
@@ -769,14 +831,13 @@ $ymax_dtheta =  80;
         	$ybot2 = $ymin - 0.10 * $ydiff;
         	$ytop1 = $ymax - 0.10 * $ydiff;
 	
-        	@xbin  = @dm_h_s;
-        	@ybin  = @dt_h_s;
-        	$total = $dn_h_s;
-	
         	pgsvp(0.15, 0.98, $pst[$pnl_cnt], $ped[$pnl_cnt]);
         	pgswin($xmin, $xmax, $ymin, $ymax);
 		pgbox(ABCNST,0.0 , 0.0, ABCNSTV, 0.0, 0.0);
-        	pgptxt($xside2,$ymid, 90.0, 0.5, "dtheta (second)");
+        	pgptxt($xside, $ymid, 90.0, 0.5, "dtheta (second)");
+	
+		@xbin  = @xdata;
+		@ybin  = @ydata;
 	
         	plot_fig();
 	
@@ -791,12 +852,14 @@ $ymax_dtheta =  80;
         	pgptxt($xdpos,$ytop1, 0.0, 0.0, "HRC-S      Slope: $dt_disp");
         	$pnl_cnt++;
 	}
-	pgptxt($xmin, $ybot2, 0.0, 1.0, "Time(DOM)");
+	pgptxt($xmin, $ybot2, 0.0, 1.0, "Time(DOY)");
 	pgclos();
 	
-    	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/dtheta_plot.gif");
+	$name = 'dtheta_plot_'."$year".'_'."$qtr".'.gif';
+    	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/$name");
 ###       	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./Plots/dtheta_plot.gif");
 
+}		#------ qtr plot loop
 }
 
 ########################################################
@@ -828,6 +891,10 @@ sub least_fit {
 #               $sigm_slope: the error on the slope
 ###########################################################
 
+if($total == 0){
+	$s_int = -9999;
+	$slope = -9999;
+}else{
         my($sum, $sumx, $sumy, $symxy, $sumx2, $sumy2, $tot1);
 
         $sum   = 0;
@@ -855,6 +922,7 @@ sub least_fit {
                         -2.0 *($s_int * $sumy + $slope * $sumxy
                         - $s_int * $slope * $sumx))/$tot1;
         $sigm_slope = sqrt($variance * $sum/$delta);
+}
 }
 
 ##########################################################################################
