@@ -25,11 +25,7 @@ $twist_www = '/data/mta_www/mta_sim_twist/';
 $year  = 1900   + $uyear;
 $month = $umon  + 1;
 
-$line = "<br><br><H3> Last Update: $month/$umday/$year</H3><br>";
-
-open(OUT, ">./date_file");
-print OUT "\n$line\n";
-close(OUT);
+$date_line = "<br><br><H3> Last Update: $month/$umday/$year</H3><br>";
 
 $lyear     = $year -1;
 $last_year = 'sim_twist_'."$lyear".'.html';
@@ -50,23 +46,24 @@ if($check !~ /$this_year/){
 	for($qtr = 0; $qtr < 4; $qtr++){
 		$file1 = 'twist_plot_'."$this_year".'_'."$qtr".'.gif';
 		$file2 = 'dtheta_plot_'."$this_year".'_'."$qtr".'.gif';
-		system("cp /data/mta/www/mta_sim_twist/Plots/no_data.gif /data/mta/mta_sim_twist/Plots/$file1");
-		system("cp /data/mta/www/mta_sim_twist/Plots/no_data.gif /data/mta/mta_sim_twist/Plots/$file2");
+		system("cp /data/mta4/MTA/data/no_data.gif /data/mta/mta_sim_twist/Plots/$file1");
+		system("cp /data/mta4/MTA/data/no_data.gif /data/mta/mta_sim_twist/Plots/$file2");
 	}
-	$lchk = "Year $lyear";
+	$lchk = "year: $lyear";
 	@save = ();
 	open(FH, "/data/mta/www/mta_sim_twist/sim_twist.html");
 	while(<FH>){
 		chomp $_;
 		if($_ =~ /$lchk/){
 			push(@save, $_);
-			$line = "<a href='./sim_twist_"."$year".".html'> Plots for Year "."$year"."</a><br>";
+			$line = "<a href='./sim_twist_"."$year".".html'> Plots for year: "."$year"."</a><br>";
 			push(@save, $line);
 		}else{
 			push(@save, $_);
 		}
 	}
 	close(FH);
+
 	open(OUT, ">/data/mta/www/mta_sim_twist/sim_twist.html");
 	foreach $ent (@save){
 		print OUT "$ent\n";
@@ -75,8 +72,44 @@ if($check !~ /$this_year/){
 }
 	
 
-system("cat $twist_www/house_keeping/fid_light_drift.html ./date_file > $twist_www/fid_light_drift.html");
-system("cat $twist_www/house_keeping/sim_twist.html ./date_file > $twist_www/sim_twist.html");
+#
+#--- update the reneal date
+#
 
-system("rm ./date_file");
+open(FH, "$twist_www/house_keeping/fid_light_drift.html");
+@save = ();
+while(<FH>){
+	chomp $_;
+	if($_ =~ /Last Update/){
+		push(@save, $date_line);
+	}else{
+		push(@save, $_);
+	}
+}
+close(FH);
+
+open(OUT, ">$twist_www/house_keeping/fid_light_drift.html");
+foreach $ent (@save){
+	print OUT "$ent\n";
+}
+close(OUT);
+
+
+open(FH, "$twist_www/house_keeping/sim_twist.html");
+@save = ();
+while(<FH>){
+	chomp $_;
+	if($_ =~ /Last Update/){
+		push(@save, $date_line);
+	}else{
+		push(@save, $_);
+	}
+}
+close(FH);
+
+open(OUT, ">$twist_www/house_keeping/sim_twist.html");
+foreach $ent (@save){
+	print OUT "$ent\n";
+}
+close(OUT);
 
