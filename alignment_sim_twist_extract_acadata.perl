@@ -75,7 +75,7 @@ if($file ne ''){
 }
 
 
-open(FH, "$bin_dir/.hakama");
+open(FH, "$data_dir/.hakama");
 while(<FH>){
         chomp $_;
         $hakama = $_;
@@ -83,7 +83,7 @@ while(<FH>){
 }
 close(FH);
 
-open(FH, "$bin_dir/.dare");
+open(FH, "$data_dir/.dare");
 while(<FH>){
         chomp $_;
         $dare = $_;
