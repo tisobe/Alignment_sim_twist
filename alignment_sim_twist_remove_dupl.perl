@@ -7,11 +7,22 @@
 #									#
 #	author: t. isobe (tisobe@cfa.harvard.edu)			#
 #									#
-#	last update: Nov 4, 2004					#
+#	last update: Aug 16, 2005					#
 #									#
 #########################################################################
 
-$list = `ls /data/mta/www/mta_sim_twist/Data/*`;
+############################################################
+#---- set directries
+
+$web_dir       = '/data/mta_www/mta_sim_twist/';
+$bin_dir       = '/data/mta/MTA/bin/';
+$data_dir      = '/data/mta/MTA/data/';
+$house_keeping = '/house_keeping/';
+
+############################################################
+
+
+$list = `ls $web_dir/Data/*`;
 @list = split(/\s+/, $list);
 
 foreach $file (@list){

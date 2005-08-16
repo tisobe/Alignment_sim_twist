@@ -8,9 +8,19 @@ use PGPLOT;
 #											#
 #	author: t. isobe (tisobe@cfa.harvard.edu)					#
 #											#
-#	last update: Jan 31, 2005							#
+#	last update: Aug 16, 2005							#
 #											#
 #########################################################################################
+
+############################################################
+#---- set directries
+
+$web_dir       = '/data/mta_www/mta_sim_twist/';
+$bin_dir       = '/data/mta/MTA/bin/';
+$data_dir      = '/data/mta/MTA/data/';
+$house_keeping = '/house_keeping/';
+
+############################################################
 
 #
 #--- some initial settings
@@ -108,8 +118,7 @@ foreach $detector (@detector_list){
 #
 #---- read data in (I-1, I-2, ....)
 #
-	$input = '/data/mta/www/mta_sim_twist/Data/'."$detector";
-####	$input = './Data/'."$detector";
+	$input = '$web_dir/Data/'."$detector";
 
 	open(FH, "$input");
 	@time    = ();
@@ -306,8 +315,7 @@ foreach $detector (@detector_list){
 	$det_cnt++;
 
 	$plot_name = "$detector".'.gif';
-	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp2/pgplot.ps|/data/mta4/MTA/bin/pnmcrop | /data/mta4/MTA/bin/pnmflip -r270 |/data/mta4/MTA/bin/ppmtogif > /data/mta/www/mta_sim_twist/Plots/$plot_name");
-#####	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp2/pgplot.ps|/data/mta4/MTA/bin/pnmcrop | /data/mta4/MTA/bin/pnmflip -r270 |/data/mta4/MTA/bin/ppmtogif > ./Plots/$plot_name");
+	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp2/pgplot.ps|$bin_dir/pnmcrop |$bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/$plot_name");
 	system("rm ./Sim_twist_temp2/pgplot.ps");
 }
 

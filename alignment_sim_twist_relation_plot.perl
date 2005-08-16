@@ -8,9 +8,19 @@ use PGPLOT;
 #											#
 #	author: t. isobe (tisobe@cfa.harvard.edu)					#
 #											#
-#	last updated: Feb 7, 2005							#
+#	last updated: Aug 16, 2005							#
 #											#
 #########################################################################################
+
+############################################################
+#---- set directries
+
+$web_dir       = '/data/mta_www/mta_sim_twist/';
+$bin_dir       = '/data/mta/MTA/bin/';
+$data_dir      = '/data/mta/MTA/data/';
+$house_keeping = '/house_keeping/';
+
+############################################################
 
 
 ($usec, $umin, $uhour, $umday, $umon, $uyear, $uwday, $uyday, $uisdst)= localtime(time);
@@ -32,7 +42,7 @@ $cnt      = 0;
 
 for($year = 2000; $year <= $this_year; $year++){
 	$in_data = 'data_info_'."$year";
-	open(FH, "/data/mta/www/mta_sim_twist/Data/$in_data");
+	open(FH, "$web_dir/Data/$in_data");
 	while(<FH>){
 		chomp $_;
 		@atemp = split(/\s+/, $_);
@@ -160,8 +170,7 @@ pgptxt($sim_x_bot,$yawamp_mid, 90.0, 0.5, "yawamp");
 pgptxt($sim_x_mid,$yawamp_bot,  0.0, 0.5, "sim_x");
 
 pgclos();
-system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/sim_x_base.gif");
-###system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./sim_x_base.gif");
+system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmcrop|$bin_dir/pnmcrop| $bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/sim_x_base.gif");
 
 #
 #--- plot fig: sim_z base
@@ -191,8 +200,7 @@ pgptxt($sim_z_bot2,$yawamp_mid, 90.0, 0.5, "yawamp");
 pgptxt($sim_z_mid,$yawamp_bot,  0.0, 0.5, "sim_z");
 
 pgclos();
-system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/sim_z_base.gif");
-###system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./sim_z_base.gif");
+system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmcrop| $bin_dir/pnmcrop| $bin_dirpnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/sim_z_base.gif");
 
 #
 #--- plot fig: pitchamp base
@@ -212,8 +220,7 @@ pgptxt($pitchamp_bot, $yawamp_mid, 90.0, 0.5, "yawamp");
 pgptxt($pitchamp_mid,$yawamp_bot,  0.0, 0.5, "pitchamp");
 
 pgclos();
-system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/pichamp_base.gif");
-###system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./pitchamp_base.gif");
+system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmcrop| $bin_dir/pnmcrop| $bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/pichamp_base.gif");
 
 
 system("rm pgplot.ps");

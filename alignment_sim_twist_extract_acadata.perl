@@ -7,9 +7,19 @@
 #											#
 #	author: t. isobe (tisobe@cfa.harvard.edu)					#
 #											#
-#	last update: Dec 29, 2004							#
+#	last update: Aug 16, 2005							#
 #											#
 #########################################################################################
+
+############################################################
+#---- set directries
+
+$web_dir       = '/data/mta_www/mta_sim_twist/';
+$bin_dir       = '/data/mta/MTA/bin/';
+$data_dir      = '/data/mta/MTA/data/';
+$house_keeping = '/house_keeping/';
+
+############################################################
 
 #
 #---- two possible input; one from a data file telling date interval to compute
@@ -60,12 +70,12 @@ if($file ne ''){
 
         $start = "$lyear"."/$lmonth".'/01'.',00:00:00';
         $stop  = "$year"."/$month".'/01'.',00:00:00';
-        $line = "$start\t$stop\n";
+        $line  = "$start\t$stop\n";
         @date_list = ("$line");
 }
 
 
-open(FH, "/data/mta4/MTA/data/.hakama");
+open(FH, "$bin_dir/.hakama");
 while(<FH>){
         chomp $_;
         $hakama = $_;
@@ -73,7 +83,7 @@ while(<FH>){
 }
 close(FH);
 
-open(FH, '/data/mta4/MTA/data/.dare');
+open(FH, '$bin_dir/.dare');
 while(<FH>){
         chomp $_;
         $dare = $_;
@@ -167,7 +177,7 @@ foreach $line (@date_list){
 
 	system("perl /home/ascds/DS.release/bin/dataseeker.pl outfile=./Sim_twist_temp/out.fits search_crit=\"columns=_fapos_avg,_tscpos_avg timestart=$tstart_sec timestop=$tstop_sec\"");
 	
-	system("fdump ./Sim_twist_temp/out.fits ./Sim_twist_temp/zout - - clobber=yes");
+	system("dmlist infile=./Sim_twist_temp/out.fits outfile=./Sim_twist_temp/zout opt=data");
 	
 	open(FH, './Sim_twist_temp/zout');
 	@sim_time = ();
@@ -209,7 +219,8 @@ system('rm -rf  ./Sim_twist_temp ./param');
 
 sub extract_data{
 
-	system("fdump $file ./Sim_twist_temp/zout slot,id_string,id_num - clobber=yes");
+	$line = "$file".'[cols slot,id_string,id_num]';
+	system("dmlist infile=\"$line\" outfile=./Sim_twist_temp/zout opt=data");
 	open(IN, './Sim_twist_temp/zout');
 	$ent_cnt = 0;
 	@detect_chip_id = ();
@@ -257,11 +268,12 @@ sub extract_data{
 #---- extract data just for one slot
 #
 		$line = "$file_name".'[slot='."$slot_id".']';
-		system("dmcopy \"$line\" ./Sim_twist_temp/tmp.fits option=all  clobber=yes");
+		system("dmcopy infile=\"$line\" outfile=./Sim_twist_temp/tmp.fits option=all  clobber=yes");
 #
 #---- extract time , center i and j position
 #	
-		system("fdump ./Sim_twist_temp/tmp.fits ./Sim_twist_temp/zout2 time,cent_i,cent_j - clobber=yes");
+		$line = './Sim_twist_temp/tmp.fits[cols time,cent_i,cent_j]';
+		system("dmlist infile=\"$line\" outfile=./Sim_twist_temp/zout2 opt=data");
 		open(IN, './Sim_twist_temp/zout2');
 		@time   = ();
 		@cent_i = ();
@@ -284,7 +296,8 @@ sub extract_data{
 #
 #---- extract angle y and z, plus algorithm used (1 or 8)
 #
-		system("fdump ./Sim_twist_temp/tmp.fits ./Sim_twist_temp/zout2 ang_y,ang_z,alg - clobber=yes");
+		$line = './Sim_twist_temp/tmp.fits[cols ang_y,ang_z,alg]';
+		system("dmlist infile=\"$line\" outfile=./Sim_twist_temp/zout2 opt=data");
 		open(IN, './Sim_twist_temp/zout2');
 		while(<IN>){
 			chomp $_;
@@ -396,8 +409,7 @@ sub extract_data{
 			print OUT "$tsc_mid\n";
 		}
 		close(OUT);
-		$name = "/data/mta/www/mta_sim_twist/Data/$detect_chip_id[$chip_cnt]";
-###		$name = "./Data/$detect_chip_id[$chip_cnt]";
+		$name = "$web_dir/Data/$detect_chip_id[$chip_cnt]";
 		$chip_cnt++;
 		system("cat ./Sim_twist_temp/test_out >> $name");
 		system("rm ./Sim_twist_temp/test_out");

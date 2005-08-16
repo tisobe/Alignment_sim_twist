@@ -9,7 +9,7 @@ How to run Sim_twist task
 
 Go to any run directory and call the following wrap scrit:
 
-	/data/mta4/MTA/bin/alignment_sim_twist_wrap_script
+	/data/mta/MTA/bin/alignment_sim_twist_wrap_script
 
 The final results will be saved in:
 
@@ -29,7 +29,7 @@ Directory and file descriptions for Sim_twist tasks
 
 
 
-/data/mta4/MTA/doc/Alignment/Sim_twist/
+/data/mta/MTA/doc/Alignment/Sim_twist/
 ---------------------------------------
 	README: this file
 
@@ -53,7 +53,7 @@ Directory and file descriptions for Sim_twist tasks
 
 
 
-/data/mta4/MTA/bin:
+/data/mta/MTA/bin:
 -------------------
 alignment_sim_twist_wrap_script:	control script
 alignment_sim_twist_main_script		this actually run the perl script listed below
@@ -80,8 +80,8 @@ Input:
 		 If it is a blank, it takes a month long interval (a prvious month
 		 assuming the script is run the early part of the month).
 
-	/data/mta4/MTA/data/.dare: 	a user name
-	/data/mta4/MTA/data/.hakama:	a user password
+	/data/mta/MTA/data/.dare: 	a user name
+	/data/mta/MTA/data/.hakama:	a user password
 
 	pcadf*_asol1.fits: These files are obtained from database using arc4gl.
 			   While computing, the data are save in ./Sim_twist_temp/.
@@ -89,13 +89,13 @@ Input:
 			   after computation is finished.
 
 Output:
-	/data/mta4/MTA/data/Sim_twist/data_extracted: 
+	/data/mta/MTA/data/Sim_twist/data_extracted: 
 			A list of dy, dz, and dtheta; only when one of them have none 
 			zero values, they are entered.
 		List entries
 		time    obsid	 instrument	dy    dz    dtheta
 
-	/data/mta4/MTA/data/Sim_twist/data_info
+	/data/mta/MTA/data/Sim_twist/data_info
 		List entries
 		time obsid  obs_start obs_end sim_x sim_y sim_z pitch_amp yaw_amp
 	
@@ -111,8 +111,8 @@ Input:
 		 If it is a blank, it takes a month long interval (a prvious month
 		 assuming the script is run the early part of the month).
 
-	/data/mta4/MTA/data/.dare: 	a user name
-	/data/mta4/MTA/data/.hakama:	a user password
+	/data/mta/MTA/data/.dare: 	a user name
+	/data/mta/MTA/data/.hakama:	a user password
 
 	pcadf*fidpr1fits
 	pcadf*acen1.fits:  These files are obtained from database using arc4gl.
@@ -124,7 +124,7 @@ Input:
 	dataseeker:	   From dataseeker, we extract fa and tsc postions.
 
 Output:
-	/data/mta4/MTA/data/Sim_twist/Data/<detctor_chip_id>
+	/data/mta/MTA/data/Sim_twist/Data/<detctor_chip_id>
 		where <detctor_chip_id> is S-1, S-2, ....I-1, I-2, etc. 
 		List entries
 		time   slot_id   fid_id   algorithm   i   j   y  z  fa_position   tsc_position
@@ -137,11 +137,11 @@ alignment_sim_twist_fid_trend_plots.perl
 This script reads data created above, and plots them.
 
 Input: 
-	/dta/mta4/MTA/data/Sim_twist/Data/<detector_chip_id>
+	/dta/mta/MTA/data/Sim_twist/Data/<detector_chip_id>
 		where <detctor_chip_id> is S-1, S-2, ....I-1, I-2, etc.
 
 Output:
-	 /data/mta4/MTA/data/Sim_twist/Plots/<plot_name>
+	 /data/mta/MTA/data/Sim_twist/Plots/<plot_name>
 		where <plot_name> is I-1.gif, I-2.gif... etc
 
 ------------------------------------

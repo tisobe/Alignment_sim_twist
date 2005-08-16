@@ -11,10 +11,19 @@ use PGPLOT;
 #											#
 #		author: t. isobe (tisobe@cfa.harvard.edu)				#
 #											#
-#		last update: June 6, 2004						#
+#		last update: Aug, 16, 2005						#
 #											#
 #########################################################################################
 
+############################################################
+#---- set directries
+
+$web_dir       = '/data/mta_www/mta_sim_twist/';
+$bin_dir       = '/data/mta/MTA/bin/';
+$data_dir      = '/data/mta/MTA/data/';
+$house_keeping = '/house_keeping/';
+
+############################################################
 
 #
 #---- two possible input; one from a data file telling date interval to compute
@@ -74,7 +83,7 @@ if($file ne ''){
 }
 
 
-open(FH, "/data/mta4/MTA/data/.hakama");
+open(FH, "$data_dir/.hakama");
 while(<FH>){
        	chomp $_;
        	$hakama = $_;
@@ -82,7 +91,7 @@ while(<FH>){
 }
 close(FH);
 
-open(FH, '/data/mta4/MTA/data/.dare');
+open(FH, '$data_dir/.dare');
 while(<FH>){
        	chomp $_;
        	$dare = $_;
@@ -207,10 +216,8 @@ sub extract_data{
 #
 $out_name1 = 'data_extracted_'."$year";
 $out_name2 = 'data_info_'."$year";
-	open(OUT,  ">> /data/mta/www/mta_sim_twist/Data/$out_name1");
-	open(OUT2, ">> /data/mta/www/mta_sim_twist/Data/$out_name2");
-###	open(OUT,  '>> ./Data/data_extracted');
-###	open(OUT2, '>> ./Data/data_info');
+	open(OUT,  ">> $web_dir/Data/$out_name1");
+	open(OUT2, ">> $web_dir/Data/$out_name2");
 
 	foreach $file (@list){
 
@@ -218,7 +225,34 @@ $out_name2 = 'data_info_'."$year";
 #---- use fdump to extact the part we need
 #
 
-		system("fdump $file ./Sim_twist_temp/zout time,dy,dz,dtheta - clobber=yes");
+		system("dmlist infile=$file outfile=./Sim_twist_temp/zout opt=head");
+		open(FH, "./Sim_twist_temp/zout");
+		while(<FH>){
+			chomp $_;
+			@btemp = split(/\s+/, $_);
+			if($_ =~ /DATE-OBS/){
+				$date_obs = $btemp[2];
+			}elsif($_ =~ /DATE-END/){
+				$date_end = $btemp[2];
+			}elsif($_ =~ /SIM_X/){
+				$sim_x = $btemp[2];
+			}elsif($_ =~ /SIM_Y/){
+				$sim_y = $btemp[2];
+			}elsif($_ =~ /SIM_Z/){
+				$sim_z = $btemp[2];
+			}elsif($_ =~ /PITCHAMP/){
+				$pitchamp = $btemp[2];
+			}elsif($_ =~ /YAWAMP/){
+				$yawamp = $btemp[2];
+			}elsif($_ =~ /OBS_ID/){
+				$obsid = $btemp[2];
+				$obsid =~ s/\'//g;
+			}
+		}
+		close(FH);
+		
+		$line = "$file".'[cols time,dy,dz,dtheta]';
+		system("dmlist infile=\"$line\" outfile=./Sim_twist_temp/zout opt=data");
 		open(FH, "./Sim_twist_temp/zout");
 		@ttime   = ();
 		@tdy     = ();
@@ -231,35 +265,6 @@ $out_name2 = 'data_info_'."$year";
 		$tdt_sum = 0;
 		while(<FH>){
 			chomp $_;
-			if($_ =~ /DATE-OBS/){
-				@btemp = split(/\'/, $_);
-				$date_obs = $btemp[1];
-			}elsif($_ =~ /DATE-END/){
-				@btemp = split(/\'/, $_);
-				$date_end = $btemp[1];
-			}elsif($_ =~ /SIM_X/){
-				@btemp = split(/\s+/, $_);
-				$sim_x = $btemp[2];
-			}elsif($_ =~ /SIM_Y/){
-				@btemp = split(/\s+/, $_);
-				$sim_y = $btemp[2];
-			}elsif($_ =~ /SIM_Z/){
-				@btemp = split(/\s+/, $_);
-				$sim_z = $btemp[2];
-			}elsif($_ =~ /PITCHAMP/){
-				@btemp = split(/\s+/, $_);
-				$pitchamp = $btemp[1];
-			}elsif($_ =~ /YAWAMP/){
-				@btemp = split(/\s+/, $_);
-				$yawamp = $btemp[2];
-			}elsif($_ =~ /OBS_ID/){
-				@btemp = split(/\s+/, $_);
-				$obsid = $btemp[2];
-				$obsid =~ s/\'//g;
-			}
-	
-		
-
 			@atemp = split(/\s+/, $_);
 			if($atemp[1] =~ /\d/ && $atemp[2] =~ /\d/){
 				if($counter == 0){
@@ -357,7 +362,7 @@ $out_name2 = 'data_info_'."$year";
 ########################################################
 
 sub print_html{
-        open(OUT, '>/data/mta/www/mta_sim_twist/sim_twist.html');
+        open(OUT, ">$web_dir/sim_twist.html");
         print OUT '<html>',"\n";
 #        print OUT '<BODY TEXT="#FFFFFF" BGCOLOR="#000000" LINK="#00CCFF" VLINK="#B6FFFF" ALINK="#FF0000", background ="./stars.jpg">',"\n";
         print OUT '<BODY TEXT="#FFFFFF" BGCOLOR="#000000" LINK="yellow" VLINK="yellow" ALINK="yellow", background ="./stars.jpg">',"\n";
@@ -410,8 +415,7 @@ sub print_html{
 
 sub plot_data{
 
-	$in_list = `ls /data/mta/www/mta_sim_twist//Data/data_extracted_*`;
-###	$in_list = `ls ./Data/data_extracted_*`;
+	$in_list = `ls $web_dir/Data/data_extracted_*`;
 	@data_file = split(/\s+/, $in_list);
 
 	@time   = ();
@@ -464,8 +468,7 @@ sub plot_data{
 		close(FH);
 	}
 
-	$in_list = `ls /data/mta/www/mta_sim_twist//Data/data_info_*`;
-###	$in_list = `ls ./Data/data_info_*`;
+	$in_list = `ls $web_dir/Data/data_info_*`;
 	@data_file = split(/\s+/, $in_list);
 
 	@date     = ();
@@ -707,8 +710,7 @@ $ymin_yawamp = 0.0;
 	pgptxt($xmin,$ybot_yawamp, 0.0, 1.0, "Time (DOM)");
 	pgclos();
 
-	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/sim_plot.gif");
-###	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./Plots/sim_plot.gif");
+	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmcrop| $bin_dir/pnmcrop| $bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/sim_plot.gif");
 
 #
 #---- sim twist plot starts here
@@ -960,8 +962,7 @@ $ymax_dtheta =  80;
 	pgptxt($xmid,$ybot_dtheta, 0.0, 0.5, "Time (DOM)");
 	pgclos();
 
-	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/twist_plot.gif");
-###	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./Plots/twist_plot.gif");
+	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmcrop| $bin_dir/pnmcrop| $bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/twist_plot.gif");
 	system("rm ./Sim_twist_temp/pgplot.ps");
 
 #
@@ -1177,8 +1178,8 @@ $ymax_dtheta =  80;
 	pgptxt($xmin, $ybot2, 0.0, 1.0, "Time(DOM)");
 	pgclos();
 	
-    	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/dtheta_plot.gif");
-###  	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./Plots/dtheta_plot.gif");
+    	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmcrop| $bin_dir/pnmcrop| $bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/dtheta_plot.gif");
+	system("rm ./Sim_twist_temp/pgplot.ps");
 
 }
 

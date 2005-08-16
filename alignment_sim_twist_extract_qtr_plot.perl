@@ -3,13 +3,24 @@ use PGPLOT;
 
 #########################################################################################
 #											#
-#	alignment_sim_twist_extract_plot_only.perl: plot extracted sim dy, dz, dtheta 	#
+#   alignment_sim_twist_extract_qtr_plot.perl: plot extracted sim dy, dz, dtheta 	#
+#						for qouter period			#
 #											#
 #		author: t. isobe (tisobe@cfa.harvard.edu)				#
 #											#
-#		last update: June 6,  2005						#
+#		last update: Aug 16,  2005						#
 #											#
 #########################################################################################
+
+############################################################
+#---- set directries
+
+$web_dir       = '/data/mta_www/mta_sim_twist/';
+$bin_dir       = '/data/mta/MTA/bin/';
+$data_dir      = '/data/mta/MTA/data/';
+$house_keeping = '/house_keeping/';
+
+############################################################
 
 $ year = $ARGV[0];
 chomp $year;
@@ -45,7 +56,7 @@ system("rm ./Sim_twist_temp");
 
 sub plot_data{
 
-	$in_list = `ls /data/mta/www/mta_sim_twist//Data/$input_file`;
+	$in_list = `ls $web_dir/Data/$input_file`;
 	@data_file = split(/\s+/, $in_list);
 
 	@time   = ();
@@ -103,8 +114,7 @@ sub plot_data{
 		close(FH);
 	}
 
-	$in_list = `ls /data/mta/www/mta_sim_twist//Data/$input_file2`;
-###	$in_list = `ls ./Data/data_info_*`;
+	$in_list = `ls $web_dir/Data/$input_file2`;
 	@data_file = split(/\s+/, $in_list);
 
 	@date     = ();
@@ -346,8 +356,7 @@ $ymin_yawamp = 0.0;
 	pgptxt($xmin,$ybot_yawamp, 0.0, 1.0, "Time (DOY)");
 	pgclos();
 
-###	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/sim_plot_$year.gif");
-###	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./Plots/sim_plot.gif");
+###	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| $bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/sim_plot_$year.gif");
 
 #
 #---- sim twist plot starts here
@@ -570,8 +579,7 @@ for($qtr = 0; $qtr < 4; $qtr++){
 	pgclos();
 
 	$name = 'twist_plot_'."$year".'_'."$qtr".'.gif';
-	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/$name");
-###	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./Plots/twist_plot.gif");
+	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| $bin_dir/pnmflip -r270 |$bi_dir/ppmtogif > $web_dir/Plots/$name");
 	system("rm ./Sim_twist_temp/pgplot.ps");
 
 #
@@ -856,8 +864,7 @@ for($qtr = 0; $qtr < 4; $qtr++){
 	pgclos();
 	
 	$name = 'dtheta_plot_'."$year".'_'."$qtr".'.gif';
-    	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| pnmflip -r270 |ppmtogif > /data/mta/www/mta_sim_twist/Plots/$name");
-###       	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|/data/mta4/MTA/bin/pnmcrop| /data/mta4/MTA/bin/pnmcrop| pnmflip -r270 |ppmtogif > ./Plots/dtheta_plot.gif");
+    	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| $bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/$name");
 
 }		#------ qtr plot loop
 }

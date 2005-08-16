@@ -10,11 +10,15 @@
 #									#
 #########################################################################
 
-#
-#---- set output directory
-#
+############################################################
+#---- set directries
 
-$twist_www = '/data/mta_www/mta_sim_twist/';
+$web_dir       = '/data/mta_www/mta_sim_twist/';
+$bin_dir       = '/data/mta/MTA/bin/';
+$data_dir      = '/data/mta/MTA/data/';
+$house_keeping = '/house_keeping/';
+
+############################################################
 
 #
 #----  update the html page
@@ -31,10 +35,10 @@ $lyear     = $year -1;
 $last_year = 'sim_twist_'."$lyear".'.html';
 $this_year = 'sim_twist_'."$year".'.html';
 
-$check = `ls /data/mta/www/mta_sim_twist/*html`;
+$check = `ls $web_dir/*html`;
 if($check !~ /$this_year/){
-	open(FH,  "/data/mta/www/mta_sim_twist/$last_year");
-	open(OUT, ">/data/mta/www/mta_sim_twist/$this_year");
+	open(FH,  "$web_dir/$last_year");
+	open(OUT, ">$web_dir/$this_year");
 	while(<FH>){
 		chomp $_;
 		$line = $_;
@@ -46,12 +50,12 @@ if($check !~ /$this_year/){
 	for($qtr = 0; $qtr < 4; $qtr++){
 		$file1 = 'twist_plot_'."$this_year".'_'."$qtr".'.gif';
 		$file2 = 'dtheta_plot_'."$this_year".'_'."$qtr".'.gif';
-		system("cp /data/mta4/MTA/data/no_data.gif /data/mta/mta_sim_twist/Plots/$file1");
-		system("cp /data/mta4/MTA/data/no_data.gif /data/mta/mta_sim_twist/Plots/$file2");
+		system("cp $data_dir/no_data.gif $web_dir/Plots/$file1");
+		system("cp $data_dir/no_data.gif $web_dir/Plots/$file2");
 	}
 	$lchk = "year: $lyear";
 	@save = ();
-	open(FH, "/data/mta/www/mta_sim_twist/sim_twist.html");
+	open(FH, "$web_dir/sim_twist.html");
 	while(<FH>){
 		chomp $_;
 		if($_ =~ /$lchk/){
@@ -64,7 +68,7 @@ if($check !~ /$this_year/){
 	}
 	close(FH);
 
-	open(OUT, ">/data/mta/www/mta_sim_twist/sim_twist.html");
+	open(OUT, ">$web_dir/sim_twist.html");
 	foreach $ent (@save){
 		print OUT "$ent\n";
 	}
@@ -76,7 +80,7 @@ if($check !~ /$this_year/){
 #--- update the reneal date
 #
 
-open(FH, "$twist_www/house_keeping/fid_light_drift.html");
+open(FH, "$web_dir/$house_keeping/fid_light_drift.html");
 @save = ();
 while(<FH>){
 	chomp $_;
@@ -88,14 +92,14 @@ while(<FH>){
 }
 close(FH);
 
-open(OUT, ">$twist_www/house_keeping/fid_light_drift.html");
+open(OUT, ">$web_dir/$house_keeping/fid_light_drift.html");
 foreach $ent (@save){
 	print OUT "$ent\n";
 }
 close(OUT);
 
 
-open(FH, "$twist_www/house_keeping/sim_twist.html");
+open(FH, "$web_dir/$house_keeping/sim_twist.html");
 @save = ();
 while(<FH>){
 	chomp $_;
@@ -107,7 +111,7 @@ while(<FH>){
 }
 close(FH);
 
-open(OUT, ">$twist_www/house_keeping/sim_twist.html");
+open(OUT, ">$web_dir/$house_keeping/sim_twist.html");
 foreach $ent (@save){
 	print OUT "$ent\n";
 }
