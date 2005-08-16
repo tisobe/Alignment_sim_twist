@@ -83,7 +83,7 @@ while(<FH>){
 }
 close(FH);
 
-open(FH, '$bin_dir/.dare');
+open(FH, "$bin_dir/.dare");
 while(<FH>){
         chomp $_;
         $dare = $_;

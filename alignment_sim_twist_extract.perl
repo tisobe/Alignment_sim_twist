@@ -91,7 +91,7 @@ while(<FH>){
 }
 close(FH);
 
-open(FH, '$data_dir/.dare');
+open(FH, "$data_dir/.dare");
 while(<FH>){
        	chomp $_;
        	$dare = $_;
