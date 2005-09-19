@@ -80,7 +80,7 @@ if($check !~ /$this_year/){
 #--- update the reneal date
 #
 
-open(FH, "$web_dir/$house_keeping/fid_light_drift.html");
+open(FH, "$web_dir/fid_light_drift.html");
 @save = ();
 while(<FH>){
 	chomp $_;
@@ -92,14 +92,14 @@ while(<FH>){
 }
 close(FH);
 
-open(OUT, ">$web_dir/$house_keeping/fid_light_drift.html");
+open(OUT, ">$web_dir/fid_light_drift.html");
 foreach $ent (@save){
 	print OUT "$ent\n";
 }
 close(OUT);
 
 
-open(FH, "$web_dir/$house_keeping/sim_twist.html");
+open(FH, "$web_dir/sim_twist.html");
 @save = ();
 while(<FH>){
 	chomp $_;
@@ -111,7 +111,7 @@ while(<FH>){
 }
 close(FH);
 
-open(OUT, ">$web_dir/$house_keeping/sim_twist.html");
+open(OUT, ">$web_dir/sim_twist.html");
 foreach $ent (@save){
 	print OUT "$ent\n";
 }

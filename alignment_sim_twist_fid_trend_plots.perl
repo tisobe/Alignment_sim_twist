@@ -118,7 +118,7 @@ foreach $detector (@detector_list){
 #
 #---- read data in (I-1, I-2, ....)
 #
-	$input = '$web_dir/Data/'."$detector";
+	$input = "$web_dir".'/Data/'."$detector";
 
 	open(FH, "$input");
 	@time    = ();
