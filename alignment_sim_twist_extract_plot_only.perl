@@ -58,10 +58,14 @@ sub plot_data{
 	$dn_h_s = 0;
 	foreach $ent (@data_file){
 		open(FH, "$ent");
+		OUTER:
 		while(<FH>){
 			chomp $_;
 			@atemp = split(/\s+/, $_);
 			$dom = $atemp[0]/86400 - 567;
+			if($dom < 0){
+				next OUTER;
+			}
 			$atemp[5] *= 3600;
 			push(@time,   $dom);
 			push(@dy,     $atemp[3]);
@@ -337,9 +341,14 @@ $ymin_yawamp = 0.0;
 #---- sim twist plot starts here
 #
 	
+	@temp        = sort{$a<=>$b} @time;
 	@xbin        = @time;
 	$xmin        = $time[0];
-	$xmax        = $time[$dcnt -1];
+	$xmax        = $time[$dcnt -2];
+
+	$xmin        = $temp[0];
+	$xmin        = 0;
+	$xmax        = $temp[$dcnt -2];
 	$xdiff       = $xmax - $xmin;
 	$xmid  	     = $xmin + 0.50 * $xdiff;
 	$xside       = $xmin - 0.08 * $xdiff;
