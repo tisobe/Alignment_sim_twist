@@ -8,7 +8,7 @@ use PGPLOT;
 #											#
 #		author: t. isobe (tisobe@cfa.harvard.edu)				#
 #											#
-#		last update: Aug 16,  2005						#
+#		last update: Jan 05,  2006						#
 #											#
 #########################################################################################
 
@@ -22,8 +22,11 @@ $house_keeping = '/house_keeping/';
 
 ############################################################
 
-$ year = $ARGV[0];
+$year = $ARGV[0];
 chomp $year;
+
+$chk = 0;
+
 if($year eq ''){
 #
 #----  update the html page
@@ -35,18 +38,48 @@ if($year eq ''){
         $month = $umon  + 1;
 
         $line = "<br><H3> Last Update: $month/$umday/$year</H3>";
+	$chk = 1;
 }
+
+if($month == 1 && $chk == 1){
+
+#
+#--- if this is the first month of the year, create the last year's plot
+#
+
+	$tyear = $year;
+	$year = $year -1;
+
+	$name1 = "data_extracted_$tyear";
+	$name2 = "data_extracted_$year";
+
+	system("cat $name1 >> $name2");
+	system("rm $name1");
+
+	$name1 = "data_info_$tyear";
+	$name2 = "data_info_$year";
+
+	system("cat $name1 >> $name2");
+
+	system("rm $name1");
 
 	$input_file = 'data_extracted_'."$year";
 	$input_file2 = 'data_info_'."$year";
 
-
-$test = `ls -d`;
-if($test !~ /Sim_twist_temp/){
-	system("mkdir ./Sim_twist_temp");
+	plot_data();
+}else{
+	$input_file = 'data_extracted_'."$year";
+	$input_file2 = 'data_info_'."$year";
+	
+	
+	$test = `ls -d`;
+	if($test !~ /Sim_twist_temp/){
+		system("mkdir ./Sim_twist_temp");
+	}
+	
+	plot_data();
 }
 
-plot_data();
 
 system("rm ./Sim_twist_temp");
 
@@ -113,6 +146,7 @@ sub plot_data{
 		}
 		close(FH);
 	}
+
 
 	$in_list = `ls $web_dir/Data/$input_file2`;
 	@data_file = split(/\s+/, $in_list);
@@ -356,7 +390,7 @@ $ymin_yawamp = 0.0;
 	pgptxt($xmin,$ybot_yawamp, 0.0, 1.0, "Time (DOY)");
 	pgclos();
 
-###	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/sim_plot_$year.gif");
+	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/sim_plot_$year.gif");
 
 #
 #---- sim twist plot starts here

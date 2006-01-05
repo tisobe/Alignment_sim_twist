@@ -195,7 +195,7 @@ foreach $line (@date_list){
 #
 
 plot_data();
-print_html();
+##print_html();
 system('rm -rf  ./Sim_twist_temp ./param');
 
 ###################################################################################

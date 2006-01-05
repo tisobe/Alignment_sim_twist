@@ -8,7 +8,7 @@ use PGPLOT;
 #											#
 #		author: t. isobe (tisobe@cfa.harvard.edu)				#
 #											#
-#		last update: Aug 16,  2005						#
+#		last update: Jan 05,  2006						#
 #											#
 #########################################################################################
 
@@ -25,6 +25,7 @@ $house_keeping = '/house_keeping/';
 $ year = $ARGV[0];
 chomp $year;
 if($year eq ''){
+$chk = 0;
 #
 #----  update the html page
 #
@@ -35,16 +36,20 @@ if($year eq ''){
         $month = $umon  + 1;
 
         $line = "<br><H3> Last Update: $month/$umday/$year</H3>";
+	$chk = 1;
 }
-
-	$input_file = 'data_extracted_'."$year";
-	$input_file2 = 'data_info_'."$year";
-
 
 $test = `ls -d`;
 if($test !~ /Sim_twist_temp/){
 	system("mkdir ./Sim_twist_temp");
 }
+
+if($month == 1 && $chk == 1){
+	$year--;
+}
+
+$input_file  = 'data_extracted_'."$year";
+$input_file2 = 'data_info_'."$year";
 
 plot_data();
 
@@ -579,7 +584,7 @@ for($qtr = 0; $qtr < 4; $qtr++){
 	pgclos();
 
 	$name = 'twist_plot_'."$year".'_'."$qtr".'.gif';
-	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| $bin_dir/pnmflip -r270 |$bi_dir/ppmtogif > $web_dir/Plots/$name");
+    	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| $bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/$name");
 	system("rm ./Sim_twist_temp/pgplot.ps");
 
 #
