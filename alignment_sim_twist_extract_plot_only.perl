@@ -7,7 +7,7 @@ use PGPLOT;
 #											#
 #		author: t. isobe (tisobe@cfa.harvard.edu)				#
 #											#
-#		last update: Aug 16,  2005						#
+#		last update: Oct 01,  2007						#
 #											#
 #########################################################################################
 
@@ -378,7 +378,7 @@ $ymin_yawamp = 0.0;
 		$ydiff   = abs($ymax_dy - $ymin_dy);
 		if($ydiff > 0){
 			$ymin_dy = $ymin_dy - 0.01 * $ydiff;
-			$ymax_dy = $ymax_dy + 0.01 * $ydiff;
+			$ymax_dy = $ymax_dy + 0.10 * $ydiff;
 		}
 		$ymid_dy      = $ymin_dy + 0.50 * $ydiff;
 		$yside_dy     = $ymin_dy + 0.50 * $ydiff;
@@ -389,17 +389,24 @@ $ymin_yawamp = 0.0;
 		@ploty1 = ();
 		@plotx2 = ();
 		@ploty2 = ();
+		@plotx3 = ();
+		@ploty3 = ();
 		$pcnt1  = 0;
 		$pcnt2  = 0;
+		$pcnt3  = 0;
 		for($i = 0; $i < $dcnt; $i++){
 			if($time[$i] < 1400){
 				push(@plotx1, $time[$i]);
 				push(@ploty1, $dy[$i]);
 				$pcnt1++;
-			}else{
+			}elsif($time[$i] < 2700){
 				push(@plotx2, $time[$i]);
 				push(@ploty2, $dy[$i]);
 				$pcnt2++;
+			}else{
+				push(@plotx3, $time[$i]);
+				push(@ploty3, $dy[$i]);
+				$pcnt3++;
 			}
 		}
 		@xbin  = @plotx1;
@@ -417,6 +424,14 @@ $ymin_yawamp = 0.0;
 		$dy_int2   = $s_int;
 		$dy_slope2 = $slope;
 		$dy_disp2 = sprintf "%4.3e", $slope;
+
+		@xbin  = @plotx3;
+		@ybin  = @ploty3;
+		$total = $pcnt3;
+		least_fit();
+		$dy_int3   = $s_int;
+		$dy_slope3 = $slope;
+		$dy_disp3 = sprintf "%4.3e", $slope;
 #
 #------ dz
 #
@@ -433,7 +448,7 @@ $ymin_yawamp = 0.0;
 		$ydiff   = $ymax_dz - $ymin_dz;
 		if($ydiff > 0){
 			$ymin_dz = $ymin_dz - 0.01 * $ydiff;
-			$ymax_dz = $ymax_dz + 0.01 * $ydiff;
+			$ymax_dz = $ymax_dz + 0.02 * $ydiff;
 		}
 		$ymid_dz      = $ymin_dz + 0.50 * $ydiff;
 		$yside_dz     = $ymin_dz + 0.50 * $ydiff;
@@ -444,17 +459,24 @@ $ymin_yawamp = 0.0;
 		@ploty1 = ();
 		@plotx2 = ();
 		@ploty2 = ();
+		@plotx3 = ();
+		@ploty3 = ();
 		$pcnt1  = 0;
 		$pcnt2  = 0;
+		$pcnt3  = 0;
 		for($i = 0; $i < $dcnt; $i++){
 			if($time[$i] < 1400){
 				push(@plotx1, $time[$i]);
 				push(@ploty1, $dz[$i]);
 				$pcnt1++;
-			}else{
+			}elsif($time[$i] < 2700){
 				push(@plotx2, $time[$i]);
 				push(@ploty2, $dz[$i]);
 				$pcnt2++;
+			}else{
+				push(@plotx3, $time[$i]);
+				push(@ploty3, $dz[$i]);
+				$pcnt3++;
 			}
 		}
 		@xbin  = @plotx1;
@@ -472,6 +494,14 @@ $ymin_yawamp = 0.0;
 		$dz_int2   = $s_int;
 		$dz_slope2 = $slope;
 		$dz_disp2 = sprintf "%4.3e", $slope;
+
+		@xbin  = @plotx3;
+		@ybin  = @ploty3;
+		$total = $pcnt3;
+		least_fit();
+		$dz_int3   = $s_int;
+		$dz_slope3 = $slope;
+		$dz_disp3 = sprintf "%4.3e", $slope;
 
 #
 #----- dtheta
@@ -532,16 +562,22 @@ $ymax_dtheta =  80;
 	pgmove($xmin, $ymin);
 	pgdraw(1400, $ymax);
 	$ymin = $dy_int2 + $dy_slope2 * 1400;
-	$ymax = $dy_int2 + $dy_slope2 * $xmax;
+	$ymax = $dy_int2 + $dy_slope2 * 2700;
 	pgmove(1400, $ymin);
+	pgdraw(2700, $ymax);
+	$ymin = $dy_int3 + $dy_slope3 * 2700;
+	$ymax = $dy_int3 + $dy_slope3 * $xmax;
+	pgmove(2700, $ymin);
 	pgdraw($xmax, $ymax);
 	pgsci(1);
 	$xdpos = $xmin + 0.04 * $xdiff;
 	$diff  = $ymax_dy - $ymin_dy;
 	$ytop1 = $ymax_dy - 0.10 * $diff; 
 	$ytop2 = $ymax_dy - 0.20 * $diff; 
+	$ytop3 = $ymax_dy - 0.30 * $diff; 
 	pgptxt($xdpos,$ytop1, 0.0, 0.0, "Slope (dom < 1400): $dy_disp1");
-	pgptxt($xdpos,$ytop2, 0.0, 0.0, "Slope (dom > 1400): $dy_disp2");
+	pgptxt($xdpos,$ytop2, 0.0, 0.0, "Slope (dom < 2700): $dy_disp2");
+	pgptxt($xdpos,$ytop3, 0.0, 0.0, "Slope (dom > 2700): $dy_disp3");
 
 	$color = 2;
 
@@ -558,16 +594,22 @@ $ymax_dtheta =  80;
 	pgmove($xmin, $ymin);
 	pgdraw(1400, $ymax);
 	$ymin = $dz_int2 + $dz_slope2 * 1400;
-	$ymax = $dz_int2 + $dz_slope2 * $xmax;
+	$ymax = $dz_int2 + $dz_slope2 * 2700;
 	pgmove(1400, $ymin);
+	pgdraw(2700, $ymax);
+	$ymin = $dz_int3 + $dz_slope3 * 2700;
+	$ymax = $dz_int3 + $dz_slope3 * $xmax;
+	pgmove(2700, $ymin);
 	pgdraw($xmax, $ymax);
 	pgsci(1);
 	$xdpos = $xmin + 0.04 * $xdiff;
 	$diff  = $ymax_dz - $ymin_dz;
 	$ytop1 = $ymax_dz - 0.10 * $diff; 
 	$ytop2 = $ymax_dz - 0.20 * $diff; 
+	$ytop3 = $ymax_dz - 0.30 * $diff; 
 	pgptxt($xdpos,$ytop1, 0.0, 0.0, "Slope (dom < 1400): $dz_disp1");
-	pgptxt($xdpos,$ytop2, 0.0, 0.0, "Slope (dom > 1400): $dz_disp2");
+	pgptxt($xdpos,$ytop2, 0.0, 0.0, "Slope (dom < 2700): $dz_disp2");
+	pgptxt($xdpos,$ytop3, 0.0, 0.0, "Slope (dom > 2700): $dz_disp3");
 
 
 	$color = 2;
