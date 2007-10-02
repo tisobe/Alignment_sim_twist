@@ -136,9 +136,10 @@ sub print_sim_page{
 	print OUT '<p>',"\n";
 	print OUT 'This page shows trends of SIM shifts (dy and dz) and twist (dtheta). All quantities are directly taken from',"\n";
 	print OUT 'pcaf*_asol1.fits files. The units are mm for dy and dz, and second  for dtheta.',"\n";
-	print OUT 'We fit two lines separated before and after (Days of Mission)= 1400 (May 21, 2003).',"\n";
+	print OUT 'We fit three lines separated before (Days of Mission)= 1400 (May 21, 2003),',"\n";
+	print OUT 'between 1400 and 2700 (Dec 11, 2006), and after 2700.',"\n";
 	print OUT 'The unit of slopes are mm per day or second per day.',"\n";
-	print OUT '<p> The sudden shift around DOM = 1400 was due to fid light drift',"\n";
+	print OUT '<p> These sudden shifts were due to fid light drift',"\n";
 	print OUT ' (see a memo by Aldocroft<a href=',"\n";
 	print OUT '"http://cxc.harvard.edu/mta/ASPECT/fid_drift/"> fiducial light drfit</a>).',"\n";
 	print OUT '<br><br>',"\n";
