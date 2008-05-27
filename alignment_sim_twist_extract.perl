@@ -11,7 +11,7 @@ use PGPLOT;
 #											#
 #		author: t. isobe (tisobe@cfa.harvard.edu)				#
 #											#
-#		last update: May, 20, 2008						#
+#		last update: May, 27, 2008						#
 #											#
 #########################################################################################
 
@@ -146,7 +146,7 @@ foreach $line (@date_list){
 	print OUT "subdetector=aca\n";
 	print OUT "level=1\n";
 	print OUT "version=last\n";
-	print OUT "tstart=$tstart\n";
+#	print OUT "tstart=$tstart\n";
 	print OUT "tstop=$tstop\n";
 	print OUT "go\n";
 	close(OUT);
