@@ -124,16 +124,19 @@ foreach $detector (@detector_list){
 	@time    = ();
 	@timei1  = ();
 	@timei2  = ();
+	@timei3  = ();
 	@fid     = ();
 	@acenti  = ();
 	@acenti1 = ();
 	@acenti2 = ();
+	@acenti3 = ();
 	@acentj  = ();
 	@fa      = ();
 	@tsc     = ();
 	$cnt     = 0 ;
 	$icnt1   = 0 ;
 	$icnt2   = 0 ;
+	$icnt3   = 0 ;
 
 	while(<FH>){
 		chomp $_;
@@ -213,10 +216,14 @@ foreach $detector (@detector_list){
 			push(@timei1, $time[$k]);
 			push(@acenti1, $acenti[$k]);
 			$icnt1++;
-		}else{
+		}elsif($time[$k] < 2700){
 			push(@timei2, $time[$k]);
 			push(@acenti2, $acenti[$k]);
 			$icnt2++;
+		}else{
+			push(@timei3, $time[$k]);
+			push(@acenti3, $acenti[$k]);
+			$icnt3++;
 		}
 	}
 
@@ -246,16 +253,34 @@ foreach $detector (@detector_list){
 	$ylin1 = $int + $slope * 1411;
 	$ylin2 = $int + $slope * $xmax;
 	pgmove(1411,$ylin1);
-	pgdraw($xmax, $ylin2);
+	pgdraw(2700, $ylin2);
 	$ymark_pos3 = $ymax - 0.2 * ($ymax - $ymin);
 	$slope_yr = 365 * $slope;
-	pgptxt($xside2, $ymark_pos3, 0.0, 0.5, "Slope(dom > 1411): $slope_yr");
+	pgptxt($xside2, $ymark_pos3, 0.0, 0.5, "Slope(1411< dom <2700): $slope_yr");
+
+	$tot = 	$icnt3;
+	@xtemp = @timei3;
+	@ytemp = @acenti3;
+	least_fit();
+	
+	$ylin1 = $int + $slope * 2700;
+	$ylin2 = $int + $slope * $xmax;
+	pgmove(2700,$ylin1);
+	pgdraw($xmax, $ylin2);
+	$ymark_pos3 = $ymax - 0.3 * ($ymax - $ymin);
+	$slope_yr = 365 * $slope;
+	pgptxt($xside2, $ymark_pos3, 0.0, 0.5, "Slope(dom > 2700): $slope_yr");
 
 	$ymark_pos4 = $ymark_pos2 - 0.1 * $ydiff;
 
 	pgsci(4);
 	pgmove(1411, $ymin);
 	pgdraw(1411, $ymax);
+	pgsci(1);
+
+	pgsci(5);
+	pgmove(2700, $ymin);
+	pgdraw(2700, $ymax);
 	pgsci(1);
 
 #
@@ -306,6 +331,11 @@ foreach $detector (@detector_list){
 	pgsci(4);
 	pgmove(1411, $ymin);
 	pgdraw(1411, $ymax);
+	pgsci(1);
+
+	pgsci(5);
+	pgmove(2700, $ymin);
+	pgdraw(2700, $ymax);
 	pgsci(1);
 
 	pgptxt($xmid, $ybot, 0.0, 0.5, "Time (DOM)");
