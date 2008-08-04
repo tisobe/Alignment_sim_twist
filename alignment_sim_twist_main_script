@@ -1,6 +1,6 @@
 setascds
 perl /data/mta/MTA/bin/alignment_sim_twist_update_html.perl
-perl /data/mta/MTA/bin/alignment_sim_twist_extract.perl
+/proj/DS.ots/perl-5.10.0.SunOS5.8/bin/perl  /data/mta/MTA/bin/alignment_sim_twist_extract.perl
 perl /data/mta/MTA/bin/alignment_sim_twist_extract_plot_only.perl
 perl /data/mta/MTA/bin/alignment_sim_twist_extract_acadata.perl
 perl /data/mat/MTA/bin/alignment_sim_twist_remove_dupl.perl
