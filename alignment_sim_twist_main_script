@@ -10,7 +10,7 @@ perl /data/mta/MTA/bin/alignment_sim_twist_update_html.perl
 perl  /data/mta/MTA/bin/alignment_sim_twist_extract.perl
 perl /data/mta/MTA/bin/alignment_sim_twist_extract_plot_only.perl
 perl /data/mta/MTA/bin/alignment_sim_twist_extract_acadata.perl
-perl /data/mat/MTA/bin/alignment_sim_twist_remove_dupl.perl
+perl /data/mta/MTA/bin/alignment_sim_twist_remove_dupl.perl
 perl /data/mta/MTA/bin/alignment_sim_twist_fid_trend_plots.perl
 perl /data/mta/MTA/bin/alignment_sim_twist_extract_year_plot.perl
 perl /data/mta/MTA/bin/alignment_sim_twist_extract_qtr_plot.perl
