@@ -1,4 +1,9 @@
-setascds
+rm -rf param
+mkdir param
+source /home/mta/bin/reset_param
+setenv PFILES "${PDIRS}:${SYSPFILES}" 
+set path = (/home/ascds/DS.release/bin/  $path)
+
 perl /data/mta/MTA/bin/alignment_sim_twist_update_html.perl
 /proj/DS.ots/perl-5.10.0.SunOS5.8/bin/perl  /data/mta/MTA/bin/alignment_sim_twist_extract.perl
 perl /data/mta/MTA/bin/alignment_sim_twist_extract_plot_only.perl
