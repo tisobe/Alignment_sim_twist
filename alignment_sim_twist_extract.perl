@@ -1,5 +1,5 @@
 #!/proj/DS.ots/perl-5.10.0.SunOS5.8/bin/perl
-BEGIN { $ENV{'SYBASE'} = "/soft/SYBASE_OCS15"; }
+BEGIN { $ENV{'SYBASE'} = "/soft/sybase"; }
 use DBI;
 use DBD::Sybase;
 use PGPLOT;
@@ -11,7 +11,7 @@ use PGPLOT;
 #											#
 #		author: t. isobe (tisobe@cfa.harvard.edu)				#
 #											#
-#		last update: May, 27, 2008						#
+#		last update: Oct  15, 2008						#
 #											#
 #########################################################################################
 
