@@ -145,8 +145,8 @@ foreach $line (@date_list){
 	print OUT "detector=pcad\n";
 	print OUT "subdetector=aca\n";
 	print OUT "level=1\n";
-	print OUT "version=last\n";
-#	print OUT "tstart=$tstart\n";
+#	print OUT "version=last\n";
+	print OUT "tstart=$tstart\n";
 	print OUT "tstop=$tstop\n";
 	print OUT "go\n";
 	close(OUT);
