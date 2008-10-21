@@ -11,7 +11,7 @@ use PGPLOT;
 #											#
 #		author: t. isobe (tisobe@cfa.harvard.edu)				#
 #											#
-#		last update: Oct  15, 2008						#
+#		last update: Oct  21, 2008						#
 #											#
 #########################################################################################
 
@@ -214,8 +214,8 @@ sub extract_data{
 #-------data_extracted contains a list of time, dy, dz, and dtheta
 #-------data_info contains the file information, such as sim_position
 #
-$out_name1 = 'data_extracted_'."$year";
-$out_name2 = 'data_info_'."$year";
+$out_name1 = 'data_extracted_'."$lyear";
+$out_name2 = 'data_info_'."$lyear";
 	open(OUT,  ">> $web_dir/Data/$out_name1");
 	open(OUT2, ">> $web_dir/Data/$out_name2");
 

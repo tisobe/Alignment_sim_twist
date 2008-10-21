@@ -7,7 +7,7 @@
 #									#
 #	author: t. isobe (tisobe@cfa.harvard.edu)			#
 #									#
-#	last update: Aug 16, 2005					#
+#	last update: Oct 21, 2008					#
 #									#
 #########################################################################
 
@@ -21,8 +21,16 @@ $house_keeping = '/house_keeping/';
 
 ############################################################
 
+($usec, $umin, $uhour, $umday, $umon, $uyear, $uwday, $uyday, $uisdst)= localtime(time);
+$umon++;
+$year = $uyear + 1900;
 
-$list = `ls $web_dir/Data/*`;
+if($umon <= 1){
+	$year--;
+}
+$name  = 'data_*_'."$year";
+
+$list = `ls $web_dir/Data/H-* $web_dir/Data/I-* $web_dir/Data/S-* $web_dir/Data/$name`;
 @list = split(/\s+/, $list);
 
 foreach $file (@list){
@@ -33,16 +41,17 @@ foreach $file (@list){
 		push(@orig, $_);
 	}
 	close(FH);
-	$first = shift(@orig);
-	@new = ($first);
+	@sorted_orig = sort{$a<=>$b} @orig;
+	$comp = shift(@orig);
+	@new = ($comp);
 	OUTER:
 	foreach $ent (@orig){
-		foreach $comp (@new){
-			if($ent eq $comp){
-				next OUTER;
-			}
+		if($ent eq $comp){
+			next OUTER;
+		}else{
+			push(@new, $ent);
+			$comp = $ent;
 		}
-		push(@new, $ent);
 	}
 
 	open(OUT, ">$file");
