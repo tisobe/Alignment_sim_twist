@@ -7,7 +7,7 @@
 #											#
 #	author: t. isobe (tisobe@cfa.harvard.edu)					#
 #											#
-#	last update: Aug 16, 2005							#
+#	last update: Jun 04, 2009							#
 #											#
 #########################################################################################
 
@@ -176,7 +176,7 @@ foreach $line (@date_list){
 
 
 #	system("perl /home/ascds/DS.release/bin/dataseeker.pl outfile=./Sim_twist_temp/out.fits search_crit=\"columns=_fapos_avg,_tscpos_avg timestart=$tstart_sec timestop=$tstop_sec\"");
-	system("perl dataseeker.pl outfile=./Sim_twist_temp/out.fits search_crit=\"columns=_fapos_avg,_tscpos_avg timestart=$tstart_sec timestop=$tstop_sec\"");
+	system("/opt/local/bin/perl dataseeker.pl outfile=./Sim_twist_temp/out.fits search_crit=\"columns=_fapos_avg,_tscpos_avg timestart=$tstart_sec timestop=$tstop_sec\"");
 	
 	system("dmlist infile=./Sim_twist_temp/out.fits outfile=./Sim_twist_temp/zout opt=data");
 	
