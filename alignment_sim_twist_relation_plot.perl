@@ -8,7 +8,7 @@ use PGPLOT;
 #											#
 #	author: t. isobe (tisobe@cfa.harvard.edu)					#
 #											#
-#	last updated: Aug 16, 2005							#
+#	last updated: Jul 15, 2009							#
 #											#
 #########################################################################################
 
@@ -170,7 +170,7 @@ pgptxt($sim_x_bot,$yawamp_mid, 90.0, 0.5, "yawamp");
 pgptxt($sim_x_mid,$yawamp_bot,  0.0, 0.5, "sim_x");
 
 pgclos();
-system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmcrop|$bin_dir/pnmcrop| $bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/sim_x_base.gif");
+system("echo ''|/opt/local/bin/gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmcrop|$bin_dir/pnmcrop| $bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/sim_x_base.gif");
 
 #
 #--- plot fig: sim_z base
@@ -200,7 +200,7 @@ pgptxt($sim_z_bot2,$yawamp_mid, 90.0, 0.5, "yawamp");
 pgptxt($sim_z_mid,$yawamp_bot,  0.0, 0.5, "sim_z");
 
 pgclos();
-system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmcrop| $bin_dir/pnmcrop| $bin_dirpnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/sim_z_base.gif");
+system("echo ''|/opt/local/bin/gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmcrop| $bin_dir/pnmcrop| $bin_dirpnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/sim_z_base.gif");
 
 #
 #--- plot fig: pitchamp base
@@ -220,7 +220,7 @@ pgptxt($pitchamp_bot, $yawamp_mid, 90.0, 0.5, "yawamp");
 pgptxt($pitchamp_mid,$yawamp_bot,  0.0, 0.5, "pitchamp");
 
 pgclos();
-system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmcrop| $bin_dir/pnmcrop| $bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/pichamp_base.gif");
+system("echo ''|/opt/local/bin/gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmcrop| $bin_dir/pnmcrop| $bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/pichamp_base.gif");
 
 
 system("rm pgplot.ps");

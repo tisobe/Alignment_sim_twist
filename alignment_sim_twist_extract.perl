@@ -11,7 +11,7 @@ use PGPLOT;
 #											#
 #		author: t. isobe (tisobe@cfa.harvard.edu)				#
 #											#
-#		last update: Oct  21, 2008						#
+#		last update: Jul  15, 2009						#
 #											#
 #########################################################################################
 
@@ -710,7 +710,7 @@ $ymin_yawamp = 0.0;
 	pgptxt($xmin,$ybot_yawamp, 0.0, 1.0, "Time (DOM)");
 	pgclos();
 
-	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmcrop| $bin_dir/pnmcrop| $bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/sim_plot.gif");
+	system("echo ''|/opt/local/bin/gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmcrop| $bin_dir/pnmcrop| $bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/sim_plot.gif");
 
 #
 #---- sim twist plot starts here
@@ -962,7 +962,7 @@ $ymax_dtheta =  80;
 	pgptxt($xmid,$ybot_dtheta, 0.0, 0.5, "Time (DOM)");
 	pgclos();
 
-	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmcrop| $bin_dir/pnmcrop| $bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/twist_plot.gif");
+	system("echo ''|/opt/local/bin/gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmcrop| $bin_dir/pnmcrop| $bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/twist_plot.gif");
 	system("rm ./Sim_twist_temp/pgplot.ps");
 
 #
@@ -1178,7 +1178,7 @@ $ymax_dtheta =  80;
 	pgptxt($xmin, $ybot2, 0.0, 1.0, "Time(DOM)");
 	pgclos();
 	
-    	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmcrop| $bin_dir/pnmcrop| $bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/dtheta_plot.gif");
+    	system("echo ''|/opt/local/bin/gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmcrop| $bin_dir/pnmcrop| $bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/dtheta_plot.gif");
 	system("rm ./Sim_twist_temp/pgplot.ps");
 
 }

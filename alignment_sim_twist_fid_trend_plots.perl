@@ -8,7 +8,7 @@ use PGPLOT;
 #											#
 #	author: t. isobe (tisobe@cfa.harvard.edu)					#
 #											#
-#	last update: Aug 16, 2005							#
+#	last update: JUL 15, 2009							#
 #											#
 #########################################################################################
 
@@ -345,7 +345,7 @@ foreach $detector (@detector_list){
 	$det_cnt++;
 
 	$plot_name = "$detector".'.gif';
-	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp2/pgplot.ps|$bin_dir/pnmcrop |$bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/$plot_name");
+	system("echo ''|/opt/local/bin/gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp2/pgplot.ps|$bin_dir/pnmcrop |$bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/$plot_name");
 	system("rm ./Sim_twist_temp2/pgplot.ps");
 }
 

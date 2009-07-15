@@ -8,7 +8,7 @@ use PGPLOT;
 #											#
 #		author: t. isobe (tisobe@cfa.harvard.edu)				#
 #											#
-#		last update: Jan 05,  2006						#
+#		last update: Jul 15,  2009						#
 #											#
 #########################################################################################
 
@@ -390,7 +390,7 @@ $ymin_yawamp = 0.0;
 	pgptxt($xmin,$ybot_yawamp, 0.0, 1.0, "Time (DOY)");
 	pgclos();
 
-	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/sim_plot_$year.gif");
+	system("echo ''|/opt/local/bin/gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/sim_plot_$year.gif");
 
 #
 #---- sim twist plot starts here
@@ -706,7 +706,7 @@ $ymax_dtheta =  50;
 	pgptxt($xmid,$ybot_dtheta, 0.0, 0.5, "Time (DOY)");
 	pgclos();
 
-	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/twist_plot_$year.gif");
+	system("echo ''|/opt/local/bin/gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/twist_plot_$year.gif");
 	system("rm ./Sim_twist_temp/pgplot.ps");
 
 #
@@ -944,7 +944,7 @@ $ymax_dtheta =  50;
 	pgptxt($xmin, $ybot2, 0.0, 1.0, "Time(DOY)");
 	pgclos();
 	
-    	system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/dtheta_plot_$year.gif");
+    	system("echo ''|/opt/local/bin/gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps|$bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/dtheta_plot_$year.gif");
 
 }
 
