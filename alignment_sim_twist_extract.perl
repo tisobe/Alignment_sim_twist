@@ -2,7 +2,7 @@
 
 use DBI;
 use DBD::Sybase;
-use PGPLOT;
+#use PGPLOT;
 
 #########################################################################################
 #											#
@@ -194,9 +194,9 @@ foreach $line (@date_list){
 #----- plot routine
 #
 
-plot_data();
+####plot_data();
 ##print_html();
-system('rm -rf  ./Sim_twist_temp ./param');
+####system('rm -rf  ./Sim_twist_temp ./param');
 
 ###################################################################################
 ### extract_data: read fits file, and extract needed data columns               ###

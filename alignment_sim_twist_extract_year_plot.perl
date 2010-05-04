@@ -8,7 +8,7 @@ use PGPLOT;
 #											#
 #		author: t. isobe (tisobe@cfa.harvard.edu)				#
 #											#
-#		last update: Jul 15,  2009						#
+#		last update: May 04,  2010						#
 #											#
 #########################################################################################
 
@@ -211,7 +211,7 @@ sub plot_data{
 			}elsif($month == 11){
 				$add = 304;
 			}elsif($month == 12){
-				$add = 333;
+				$add = 334;
 			}
 			if($year == 2000 || $year == 2004 || $year == 2008 || $year == 2012){
 				if($month > 2){
@@ -245,9 +245,21 @@ sub plot_data{
 	$xside = $xmin - 0.10 * $xdiff;
 	$xside2= $xmin - 0.12 * $xdiff;
 			
-	@temp        = sort{$a<=>$b} @sim_x;
-	$ymin_sim_x  = $temp[0];
-	$ymax_sim_x  = $temp[$icnt -1];
+#	@temp        = sort{$a<=>$b} @sim_x;
+#	$ymin_sim_x  = $temp[0];
+#	$ymax_sim_x  = $temp[$icnt -1];
+
+	$sum1 = 0;
+	$sum2 = 0;
+	for($j = 0; $j < $icnt; $j++){
+		$sum1 += $sim_x[$j];
+		$sum2 += $sim_x[$j] * $sim_x[$j];
+	}
+	$tavg = $sum1/$icnt;
+	$tsig = sqrt($sum2/$icnt - $tavg * $tavg);
+	$ymin_sim_x = $tavg - 4.0* $tsig;
+	$ymax_sim_x = $tavg + 4.0* $tsig;
+
 	$ydiff       = abs($ymax_sim_x - $ymin_sim_x);
 	$ymin_sim_x  = $ymin_sim_x - 0.01 * $ydiff;
 	$ymax_sim_x  = $ymax_sim_x + 0.01 * $ydiff;
@@ -256,9 +268,21 @@ sub plot_data{
 	$ytop_sim_x  = $ymax_sim_x + 0.05 * $ydiff;
 	$ybot_sim_x  = $ymin_sim_x - 0.20 * $ydiff;
 
-	@temp        = sort{$a<=>$b} @sim_y;
-	$ymin_sim_y  = $temp[0];
-	$ymax_sim_y  = $temp[$icnt -3];
+#	@temp        = sort{$a<=>$b} @sim_y;
+#	$ymin_sim_y  = $temp[0];
+#	$ymax_sim_y  = $temp[$icnt -3];
+
+	$sum1 = 0;
+	$sum2 = 0;
+	for($j = 0; $j < $icnt; $j++){
+		$sum1 += $sim_y[$j];
+		$sum2 += $sim_y[$j] * $sim_y[$j];
+	}
+	$tavg = $sum1/$icnt;
+	$tsig = sqrt($sum2/$icnt - $tavg * $tavg);
+	$ymin_sim_y = $tavg - 4.0* $tsig;
+	$ymax_sim_y = $tavg + 4.0* $tsig;
+
 	$ydiff       = abs($ymax_sim_y - $ymin_sim_y);
 	if($ydiff == 0){
 		$ymin_sim_y =-0.05;
@@ -272,9 +296,21 @@ sub plot_data{
 	$ytop_sim_y  = $ymax_sim_y + 0.05 * $ydiff;
 	$ybot_sim_y  = $ymin_sim_y - 0.20 * $ydiff;
 
-	@temp        = sort{$a<=>$b} @sim_z;
-	$ymin_sim_z  = $temp[0];
-	$ymax_sim_z  = $temp[$icnt -1];
+#	@temp        = sort{$a<=>$b} @sim_z;
+#	$ymin_sim_z  = $temp[0];
+#	$ymax_sim_z  = $temp[$icnt -1];
+
+	$sum1 = 0;
+	$sum2 = 0;
+	for($j = 0; $j < $icnt; $j++){
+		$sum1 += $sim_z[$j];
+		$sum2 += $sim_z[$j] * $sim_z[$j];
+	}
+	$tavg = $sum1/$icnt;
+	$tsig = sqrt($sum2/$icnt - $tavg * $tavg);
+	$ymin_sim_z = $tavg - 4.0* $tsig;
+	$ymax_sim_z = $tavg + 4.0* $tsig;
+
 	$ydiff       = abs($ymax_sim_z - $ymin_sim_z);
 	$ymin_sim_z  = $ymin_sim_z - 0.01 * $ydiff;
 	$ymax_sim_z  = $ymax_sim_z + 0.01 * $ydiff;
@@ -399,9 +435,9 @@ $ymin_yawamp = 0.0;
 	@xbin        = @time;
 	$xmin        = $time[0];
 	$xmax        = $time[$dcnt -1];
-	$xhalf       = 0.5 * ($xmax + $xmin);
 $xmin = 0; 
 $xmax = 366;
+	$xhalf       = 0.5 * ($xmax + $xmin);
 	$xdiff       = $xmax - $xmin;
 	$xmid  	     = $xmin + 0.50 * $xdiff;
 	$xside       = $xmin - 0.08 * $xdiff;
@@ -421,7 +457,11 @@ $xmax = 366;
 #
 		$sum  = 0;
 		$sum2 = 0;
+		OUTER:
 		foreach $ent (@dy){
+			if(abs($ent) > 10){
+				next OUTER;
+			}
 			$sum  += $ent;
 			$sum2 += $ent * $ent;
 		}
@@ -445,7 +485,11 @@ $xmax = 366;
 		@ploty2 = ();
 		$pcnt1  = 0;
 		$pcnt2  = 0;
+		OUTER:
 		for($i = 0; $i < $dcnt; $i++){
+			if(abs($dy[$i]) > 10){
+				next OUTER;
+			} 
 			if($year == 2003 && $time[$i] < 170){
 				push(@plotx1, $time[$i]);
 				push(@ploty1, $dy[$i]);
@@ -494,7 +538,11 @@ $xmax = 366;
 #
 		$sum  = 0;
 		$sum2 = 0;
+		OUTER:
 		foreach $ent (@dz){
+			if(abs($ent) > 10){
+				next OUTER;
+			}
 			$sum  += $ent;
 			$sum2 += $ent * $ent;
 		}
@@ -518,7 +566,11 @@ $xmax = 366;
 		@ploty2 = ();
 		$pcnt1  = 0;
 		$pcnt2  = 0;
+		OUTER:
 		for($i = 0; $i < $dcnt; $i++){
+			if(abs($dz[$i]) >10){
+				next OUTER;
+			}
 			if($year == 2003 && $time[$i] < 170){
 				push(@plotx1, $time[$i]);
 				push(@ploty1, $dz[$i]);
@@ -578,8 +630,8 @@ $xmax = 366;
 		$std = sqrt($sum2/$dcnt - $avg * $avg);
 		$ymin_dtheta = $avg - 3.0 * $std;
 		$ymax_dtheta = $avg + 3.0 * $std;
-$ymin_dtheta = -50;
-$ymax_dtheta =  50;
+$ymin_dtheta = -80;
+$ymax_dtheta =  80;
 		$ydiff       = $ymax_dtheta - $ymin_dtheta;
 		if($ydiff > 0){
 			$ymin_dtheta = $ymin_dtheta - 0.01 * $ydiff;

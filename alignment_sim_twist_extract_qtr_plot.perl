@@ -8,7 +8,7 @@ use PGPLOT;
 #											#
 #		author: t. isobe (tisobe@cfa.harvard.edu)				#
 #											#
-#		last update: Jul 15,  2009						#
+#		last update: May 04,  2010						#
 #											#
 #########################################################################################
 
@@ -216,9 +216,21 @@ sub plot_data{
 	$xside = $xmin - 0.10 * $xdiff;
 	$xside2= $xmin - 0.12 * $xdiff;
 			
-	@temp        = sort{$a<=>$b} @sim_x;
-	$ymin_sim_x  = $temp[0];
-	$ymax_sim_x  = $temp[$icnt -1];
+#	@temp        = sort{$a<=>$b} @sim_x;
+#	$ymin_sim_x  = $temp[0];
+#	$ymax_sim_x  = $temp[$icnt -1];
+
+        $sum1 = 0;
+        $sum2 = 0;
+        for($j = 0; $j < $icnt; $j++){
+                $sum1 += $sim_x[$j];
+                $sum2 += $sim_x[$j] * $sim_x[$j];
+        }
+        $tavg = $sum1/$icnt;
+        $tsig = sqrt($sum2/$icnt - $tavg * $tavg);
+        $ymin_sim_x = $tavg - 4.0* $tsig;
+        $ymax_sim_x = $tavg + 4.0* $tsig;
+
 	$ydiff       = abs($ymax_sim_x - $ymin_sim_x);
 	$ymin_sim_x  = $ymin_sim_x - 0.01 * $ydiff;
 	$ymax_sim_x  = $ymax_sim_x + 0.01 * $ydiff;
@@ -227,9 +239,20 @@ sub plot_data{
 	$ytop_sim_x  = $ymax_sim_x + 0.05 * $ydiff;
 	$ybot_sim_x  = $ymin_sim_x - 0.20 * $ydiff;
 
-	@temp        = sort{$a<=>$b} @sim_y;
-	$ymin_sim_y  = $temp[0];
-	$ymax_sim_y  = $temp[$icnt -3];
+#	@temp        = sort{$a<=>$b} @sim_y;
+#	$ymin_sim_y  = $temp[0];
+#	$ymax_sim_y  = $temp[$icnt -3];
+        $sum1 = 0;
+        $sum2 = 0;
+        for($j = 0; $j < $icnt; $j++){
+                $sum1 += $sim_y[$j];
+                $sum2 += $sim_y[$j] * $sim_y[$j];
+        }
+        $tavg = $sum1/$icnt;
+        $tsig = sqrt($sum2/$icnt - $tavg * $tavg);
+        $ymin_sim_y = $tavg - 4.0* $tsig;
+        $ymax_sim_y = $tavg + 4.0* $tsig;
+
 	$ydiff       = abs($ymax_sim_y - $ymin_sim_y);
 	if($ydiff == 0){
 		$ymin_sim_y =-0.05;
@@ -243,9 +266,21 @@ sub plot_data{
 	$ytop_sim_y  = $ymax_sim_y + 0.05 * $ydiff;
 	$ybot_sim_y  = $ymin_sim_y - 0.20 * $ydiff;
 
-	@temp        = sort{$a<=>$b} @sim_z;
-	$ymin_sim_z  = $temp[0];
-	$ymax_sim_z  = $temp[$icnt -1];
+#	@temp        = sort{$a<=>$b} @sim_z;
+#	$ymin_sim_z  = $temp[0];
+#	$ymax_sim_z  = $temp[$icnt -1];
+
+        $sum1 = 0;
+        $sum2 = 0;
+        for($j = 0; $j < $icnt; $j++){
+                $sum1 += $sim_z[$j];
+                $sum2 += $sim_z[$j] * $sim_z[$j];
+        }
+        $tavg = $sum1/$icnt;
+        $tsig = sqrt($sum2/$icnt - $tavg * $tavg);
+        $ymin_sim_z = $tavg - 4.0* $tsig;
+        $ymax_sim_z = $tavg + 4.0* $tsig;
+
 	$ydiff       = abs($ymax_sim_z - $ymin_sim_z);
 	$ymin_sim_z  = $ymin_sim_z - 0.01 * $ydiff;
 	$ymax_sim_z  = $ymax_sim_z + 0.01 * $ydiff;
@@ -361,7 +396,9 @@ $ymin_yawamp = 0.0;
 	pgptxt($xmin,$ybot_yawamp, 0.0, 1.0, "Time (DOY)");
 	pgclos();
 
-###	system("echo ''|/opt/local/bin/gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| $bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/sim_plot_$year.gif");
+	$name = 'sim_plot_'."$year".'_'."$qtr".'.gif';
+
+###	system("echo ''|/opt/local/bin/gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./Sim_twist_temp/pgplot.ps| $bin_dir/pnmflip -r270 |$bin_dir/ppmtogif > $web_dir/Plots/$name");
 
 #
 #---- sim twist plot starts here
@@ -423,7 +460,11 @@ for($qtr = 0; $qtr < 4; $qtr++){
 #
 		$sum  = 0;
 		$sum2 = 0;
+		OUTER:
 		foreach $ent (@qdy){
+			if(abs($ent) > 10){
+				next OUTER;
+			}
 			$sum  += $ent;
 			$sum2 += $ent * $ent;
 		}
@@ -441,9 +482,19 @@ for($qtr = 0; $qtr < 4; $qtr++){
 		$ytop_dy      = $ymax_dy + 0.05 * $ydiff;
 		$ybot_dy      = $ymin_dy - 0.20 * $ydiff;
 
-		@xbin  = @qtime;
-		@ybin  = @qdy;
-		$total = $qcnt;
+		@xbin  = ();
+		@ybin  = ();
+		$total = 0;
+		OUTER:
+		for($j = 0; $j < $qcnt; $j++){
+			if(abs($qdy[$j]) > 10){
+				next OUTER;
+			}
+			push(@xbin, $qtime[$j]);
+			push(@ybin, $qdy[$j]);
+			$total++;
+		}
+		
 		least_fit();
 		$dy_int1   = $s_int;
 		$dy_slope1 = $slope;
@@ -454,7 +505,11 @@ for($qtr = 0; $qtr < 4; $qtr++){
 #
 		$sum  = 0;
 		$sum2 = 0;
+		OUTER:
 		foreach $ent (@dz){
+			if(abs($ent) > 10){
+				next OUTER;
+			}
 			$sum  += $ent;
 			$sum2 += $ent * $ent;
 		}
@@ -472,9 +527,18 @@ for($qtr = 0; $qtr < 4; $qtr++){
 		$ytop_dz      = $ymax_dz + 0.05 * $ydiff;
 		$ybot_dz      = $ymin_dz - 0.20 * $ydiff;
 
-		@xbin  = @qtime;
-		@ybin  = @qdz;
-		$total = $qcnt;
+		@xbin  = ();
+		@ybin  = ();
+		$total = 0;
+		OUTER:
+		for($j = 0; $j < $qcnt; $j++){
+			if(abs($qdz[$j]) > 10){
+				next OUTER;
+			}
+			push(@xbin, $qtime[$j]);
+			push(@ybin, $qdz[$j]);
+			$total++;
+		}
 		least_fit();
 		$dz_int1   = $s_int;
 		$dz_slope1 = $slope;
