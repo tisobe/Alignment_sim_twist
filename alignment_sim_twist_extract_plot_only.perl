@@ -7,7 +7,7 @@ use PGPLOT;
 #											#
 #		author: t. isobe (tisobe@cfa.harvard.edu)				#
 #											#
-#		last update: Jul 15,  2009						#
+#		last update: Jun 10,  2100						#
 #											#
 #########################################################################################
 
@@ -188,7 +188,7 @@ sub plot_data{
 	$xmax  = $xmax + 0.01 * $xdiff;
 	$xmid  = $xmin + 0.50 * $xdiff;
 	$xside = $xmin - 0.10 * $xdiff;
-	$xside2= $xmin - 0.12 * $xdiff;
+	$xside2= $xmin - 0.10 * $xdiff;
 			
 	@temp        = sort{$a<=>$b} @sim_x;
 	$ymin_sim_x  = $temp[0];
@@ -352,6 +352,7 @@ $ymin_yawamp = 0.0;
 	$xdiff       = $xmax - $xmin;
 	$xmid  	     = $xmin + 0.50 * $xdiff;
 	$xside       = $xmin - 0.08 * $xdiff;
+	$xside2      = $xmin - 0.12 * $xdiff;
 
 	$ymin_dy     = -0.1;
 	$ymax_dy     =  0.1;
