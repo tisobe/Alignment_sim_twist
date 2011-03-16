@@ -8,17 +8,26 @@ use PGPLOT;
 #											#
 #		author: t. isobe (tisobe@cfa.harvard.edu)				#
 #											#
-#		last update: May 04,  2010						#
+#		last update: Mar 15,  2011						#
 #											#
 #########################################################################################
 
 ############################################################
 #---- set directries
 
-$web_dir       = '/data/mta_www/mta_sim_twist/';
-$bin_dir       = '/data/mta/MTA/bin/';
-$data_dir      = '/data/mta/MTA/data/';
-$house_keeping = '/house_keeping/';
+open(FH, "/data/mta/Script/ALIGNMENT/Sim_twist/house_keeping/dir_list");
+@atemp = ();
+while(<FH>){
+        chomp $_;
+        push(@atemp, $_);
+}
+close(FH);
+
+$bin_dir       = $atemp[0];
+$bdata_dir     = $atemp[1];
+$web_dir       = $atemp[2];
+$data_dir      = $atemp[3];
+$house_keeping = $atemp[4];
 
 ############################################################
 
@@ -61,7 +70,7 @@ system("rm ./Sim_twist_temp");
 
 sub plot_data{
 
-	$in_list = `ls $web_dir/Data/$input_file`;
+	$in_list = `ls $data_dir/$input_file`;
 	@data_file = split(/\s+/, $in_list);
 
 	@time   = ();
@@ -119,7 +128,7 @@ sub plot_data{
 		close(FH);
 	}
 
-	$in_list = `ls $web_dir/Data/$input_file2`;
+	$in_list = `ls $data_dir/$input_file2`;
 	@data_file = split(/\s+/, $in_list);
 
 	@date     = ();

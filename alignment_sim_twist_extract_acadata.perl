@@ -7,17 +7,26 @@
 #											#
 #	author: t. isobe (tisobe@cfa.harvard.edu)					#
 #											#
-#	last update: Jun 04, 2009							#
+#	last update: Mar 15, 2011							#
 #											#
 #########################################################################################
 
 ############################################################
 #---- set directries
 
-$web_dir       = '/data/mta_www/mta_sim_twist/';
-$bin_dir       = '/data/mta/MTA/bin/';
-$data_dir      = '/data/mta/MTA/data/';
-$house_keeping = '/house_keeping/';
+open(FH, "/data/mta/Script/ALIGNMENT/Sim_twist/house_keeping/dir_list");
+@atemp = ();
+while(<FH>){
+        chomp $_;
+        push(@atemp, $_);
+}
+close(FH);
+
+$bin_dir       = $atemp[0];
+$bdata_dir     = $atemp[1];
+$web_dir       = $atemp[2];
+$data_dir      = $atemp[3];
+$house_keeping = $atemp[4];
 
 ############################################################
 
@@ -75,7 +84,7 @@ if($file ne ''){
 }
 
 
-open(FH, "$data_dir/.hakama");
+open(FH, "$bdata_dir/.hakama");
 while(<FH>){
         chomp $_;
         $hakama = $_;
@@ -83,7 +92,7 @@ while(<FH>){
 }
 close(FH);
 
-open(FH, "$data_dir/.dare");
+open(FH, "$bdata_dir/.dare");
 while(<FH>){
         chomp $_;
         $dare = $_;
@@ -410,7 +419,7 @@ sub extract_data{
 			print OUT "$tsc_mid\n";
 		}
 		close(OUT);
-		$name = "$web_dir/Data/$detect_chip_id[$chip_cnt]";
+		$name = "$data_dir/$detect_chip_id[$chip_cnt]";
 		$chip_cnt++;
 		system("cat ./Sim_twist_temp/test_out >> $name");
 		system("rm ./Sim_twist_temp/test_out");

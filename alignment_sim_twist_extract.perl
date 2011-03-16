@@ -11,17 +11,26 @@ use DBD::Sybase;
 #											#
 #		author: t. isobe (tisobe@cfa.harvard.edu)				#
 #											#
-#		last update: Jun  10, 2010						#
+#		last update: Mar  15, 2011						#
 #											#
 #########################################################################################
 
 ############################################################
 #---- set directries
 
-$web_dir       = '/data/mta_www/mta_sim_twist/';
-$bin_dir       = '/data/mta/MTA/bin/';
-$data_dir      = '/data/mta/MTA/data/';
-$house_keeping = '/house_keeping/';
+open(FH, "/data/mta/Script/ALIGNMENT/Sim_twist/house_keeping/dir_list");
+@atemp = ();
+while(<FH>){
+        chomp $_;
+        push(@atemp, $_);
+}
+close(FH);
+
+$bin_dir       = $atemp[0];
+$bdata_dir     = $atemp[1];
+$web_dir       = $atemp[2];
+$data_dir      = $atemp[3];
+$house_keeping = $atemp[4];
 
 ############################################################
 
@@ -83,7 +92,7 @@ if($file ne ''){
 }
 
 
-open(FH, "$data_dir/.hakama");
+open(FH, "$bdata_dir/.hakama");
 while(<FH>){
        	chomp $_;
        	$hakama = $_;
@@ -91,7 +100,7 @@ while(<FH>){
 }
 close(FH);
 
-open(FH, "$data_dir/.dare");
+open(FH, "$bdata_dir/.dare");
 while(<FH>){
        	chomp $_;
        	$dare = $_;
@@ -216,8 +225,8 @@ sub extract_data{
 #
 $out_name1 = 'data_extracted_'."$lyear";
 $out_name2 = 'data_info_'."$lyear";
-	open(OUT,  ">> $web_dir/Data/$out_name1");
-	open(OUT2, ">> $web_dir/Data/$out_name2");
+	open(OUT,  ">> $data_dir/$out_name1");
+	open(OUT2, ">> $data_dir/$out_name2");
 
 	foreach $file (@list){
 
@@ -415,7 +424,7 @@ sub print_html{
 
 sub plot_data{
 
-	$in_list = `ls $web_dir/Data/data_extracted_*`;
+	$in_list = `ls $data_dir/data_extracted_*`;
 	@data_file = split(/\s+/, $in_list);
 
 	@time   = ();
@@ -468,7 +477,7 @@ sub plot_data{
 		close(FH);
 	}
 
-	$in_list = `ls $web_dir/Data/data_info_*`;
+	$in_list = `ls $data_dir/data_info_*`;
 	@data_file = split(/\s+/, $in_list);
 
 	@date     = ();

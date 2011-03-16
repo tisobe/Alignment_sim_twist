@@ -6,17 +6,26 @@
 #									#
 #	author: t. isobe (tisobe@cfa.harvard.edu)			#
 #									#
-#	last update: Jun 09, 2010					#
+#	last update: Mar 15, 2011					#
 #									#
 #########################################################################
 
 ############################################################
 #---- set directries
 
-$web_dir       = '/data/mta_www/mta_sim_twist/';
-$bin_dir       = '/data/mta/MTA/bin/';
-$data_dir      = '/data/mta/MTA/data/';
-$house_keeping = '/house_keeping/';
+open(FH, "/data/mta/Script/ALIGNMENT/Sim_twist/house_keeping/dir_list");
+@atemp = ();
+while(<FH>){
+        chomp $_;
+        push(@atemp, $_);
+}
+close(FH);
+
+$bin_dir       = $atemp[0];
+$bdata_dir     = $atemp[1];
+$web_dir       = $atemp[2];
+$data_dir      = $atemp[3];
+$house_keeping = $atemp[4];
 
 ############################################################
 
@@ -50,8 +59,8 @@ if($check !~ /$this_year/){
 	for($qtr = 0; $qtr < 4; $qtr++){
 		$file1 = 'twist_plot_'."$this_year".'_'."$qtr".'.gif';
 		$file2 = 'dtheta_plot_'."$this_year".'_'."$qtr".'.gif';
-		system("cp $data_dir/no_data.gif $web_dir/Plots/$file1");
-		system("cp $data_dir/no_data.gif $web_dir/Plots/$file2");
+		system("cp $bdata_dir/no_data.gif $web_dir/Plots/$file1");
+		system("cp $bdata_dir/no_data.gif $web_dir/Plots/$file2");
 	}
 	$lchk = "year: $lyear";
 	@save = ();
