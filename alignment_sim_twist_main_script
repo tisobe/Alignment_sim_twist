@@ -15,3 +15,10 @@ set path = (/home/ascds/DS.release/ots/bin/ $path)
 /opt/local/bin/perl /data/mta/MTA/bin/alignment_sim_twist_fid_trend_plots.perl
 /opt/local/bin/perl /data/mta/MTA/bin/alignment_sim_twist_extract_year_plot.perl
 /opt/local/bin/perl /data/mta/MTA/bin/alignment_sim_twist_extract_qtr_plot.perl
+
+rm /data/mta/Script/ALIGNMENT/Sim_twist/Exec/Sim_twist_temp/*
+
+chgrp mtagroup /data/mta_www/mta_sim_twist/*
+chgrp mtagroup /data/mta_www/mta_sim_twist/*/*
+chgrp mtagroup /data/mta/Script/ALIGNMENT/Sim_twist/Data/*
+
