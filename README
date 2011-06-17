@@ -3,18 +3,30 @@ Sim_twist contains two disctinct tasks
 	1. Fid light shift monitoring
 	2. Sim shift/twist monitoring
 
+#########
+directory
+#########
+See below for more details
+
+$bin_dir:	/data/mta/MTA/bin/
+$bdata_dir:	/data/mta/MTA/data/
+$web_dir:	/data/mta_www/mta_sim_twist/
+$data_dir:	/data/mta/Script/ALIGNMENT/Sim_twist/Data/
+$house_keeping:	/data/mta/Script/ALIGNMENT/Sim_twist/house_keeping/
+
+
 ##########################
 How to run Sim_twist task
 ###########################
 
 Go to any run directory and call the following wrap scrit:
 
-	/data/mta/MTA/bin/alignment_sim_twist_wrap_script
+	$bin_dir/alignment_sim_twist_wrap_script
 
 The final results will be saved in:
 
-	/data/mta_www/mta_sim_twist/Data/
-	/data/mta_www/mta_sim_twist/Plots/
+	$data_dir/	
+	$web_dir/Plots/
 
 or you can see the results on the html page at:
 
@@ -33,15 +45,17 @@ Directory and file descriptions for Sim_twist tasks
 ---------------------------------------
 	README: this file
 
-/data/mta_www/mta_sim_twist/
-----------------------------------------
+$data_dir
+---------
+	I-1, I-2, etc contain ACA positional information
+	data_info_<year> contain sim postion etc informaiton
+	data_extracted_<year> contain sim shift and twist information
+
+$web_dir
+---------
 	fid_light_drift.html:	html page for fid light shift 
 	sim_twist.html:		html page ofr sim shift/tiwst
 	fid_*.gif:		gif file showing fid light aiming positions
-	Data: 		data directory: 
-				I-1, I-2, etc contain ACA positional information
-				data_info_<year> contain sim postion etc informaiton
-				data_extracted_<year> contain sim shift and twist information
 	Html_dir:	html page depository I-1.html, I-2.html, etc
 			fid_light_drift.htm: fid light drift main page
 			sim_twist.html:	     sim twist main page
@@ -53,8 +67,8 @@ Directory and file descriptions for Sim_twist tasks
 
 
 
-/data/mta/MTA/bin:
--------------------
+$bin_dir (mos of them are also in /data/mta/Script/ALIGNMENT?Sim_twist/Alignment_sim_twist)
+--------
 alignment_sim_twist_wrap_script:	control script
 alignment_sim_twist_main_script		this actually run the perl script listed below
 
@@ -80,8 +94,8 @@ Input:
 		 If it is a blank, it takes a month long interval (a prvious month
 		 assuming the script is run the early part of the month).
 
-	/data/mta/MTA/data/.dare: 	a user name
-	/data/mta/MTA/data/.hakama:	a user password
+	$bdata_dir/.dare: 	a user name
+	$bdata_dir/.hakama:	a user password
 
 	pcadf*_asol1.fits: These files are obtained from database using arc4gl.
 			   While computing, the data are save in ./Sim_twist_temp/.
@@ -89,13 +103,13 @@ Input:
 			   after computation is finished.
 
 Output:
-	/data/mta/MTA/data/Sim_twist/data_extracted: 
+	/data/mta/MTA/data/Sim_twist/Exec/data_extracted: 
 			A list of dy, dz, and dtheta; only when one of them have none 
 			zero values, they are entered.
 		List entries
 		time    obsid	 instrument	dy    dz    dtheta
 
-	/data/mta/MTA/data/Sim_twist/data_info
+	/data/mta/MTA/data/Sim_twist/Exec/data_info
 		List entries
 		time obsid  obs_start obs_end sim_x sim_y sim_z pitch_amp yaw_amp
 	
@@ -111,8 +125,8 @@ Input:
 		 If it is a blank, it takes a month long interval (a prvious month
 		 assuming the script is run the early part of the month).
 
-	/data/mta/MTA/data/.dare: 	a user name
-	/data/mta/MTA/data/.hakama:	a user password
+	$bdata_dir/.dare: 	a user name
+	$bdata_dir/.hakama:	a user password
 
 	pcadf*fidpr1fits
 	pcadf*acen1.fits:  These files are obtained from database using arc4gl.
@@ -124,7 +138,7 @@ Input:
 	dataseeker:	   From dataseeker, we extract fa and tsc postions.
 
 Output:
-	/data/mta/MTA/data/Sim_twist/Data/<detctor_chip_id>
+	$data_dir/<detctor_chip_id>
 		where <detctor_chip_id> is S-1, S-2, ....I-1, I-2, etc. 
 		List entries
 		time   slot_id   fid_id   algorithm   i   j   y  z  fa_position   tsc_position
@@ -137,11 +151,11 @@ alignment_sim_twist_fid_trend_plots.perl
 This script reads data created above, and plots them.
 
 Input: 
-	/dta/mta/MTA/data/Sim_twist/Data/<detector_chip_id>
+	$data_dir/<detector_chip_id>
 		where <detctor_chip_id> is S-1, S-2, ....I-1, I-2, etc.
 
 Output:
-	 /data/mta/MTA/data/Sim_twist/Plots/<plot_name>
+	 $web_dir/Plots/<plot_name>
 		where <plot_name> is I-1.gif, I-2.gif... etc
 
 ------------------------------------

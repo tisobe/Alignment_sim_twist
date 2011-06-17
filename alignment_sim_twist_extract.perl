@@ -1,4 +1,4 @@
-#!/soft/ascds/DS.release/ots/bin/perl
+#/usr/local/bin/perl
 
 use DBI;
 use DBD::Sybase;
@@ -11,7 +11,7 @@ use DBD::Sybase;
 #											#
 #		author: t. isobe (tisobe@cfa.harvard.edu)				#
 #											#
-#		last update: Mar  15, 2011						#
+#		last update: Jun  17, 2011						#
 #											#
 #########################################################################################
 

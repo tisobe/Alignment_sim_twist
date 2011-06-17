@@ -8,7 +8,7 @@ set path = (/home/ascds/DS.release/bin/  $path)
 set path = (/home/ascds/DS.release/ots/bin/ $path)
 
 /opt/local/bin/perl /data/mta/MTA/bin/alignment_sim_twist_update_html.perl
-/soft/ascds/DS.release/ots/bin/perl  /data/mta/MTA/bin/alignment_sim_twist_extract.perl
+perl  /data/mta/MTA/bin/alignment_sim_twist_extract.perl
 /opt/local/bin/perl  /data/mta/MTA/bin/alignment_sim_twist_extract_plot_only.perl
 /opt/local/bin/perl /data/mta/MTA/bin/alignment_sim_twist_extract_acadata.perl
 /opt/local/bin/perl /data/mta/MTA/bin/alignment_sim_twist_remove_dupl.perl
