@@ -8,7 +8,7 @@ use PGPLOT;
 #											#
 #		author: t. isobe (tisobe@cfa.harvard.edu)				#
 #											#
-#		last update: Mar 15,  2011						#
+#		last update: Feb 07,  2012						#
 #											#
 #########################################################################################
 
@@ -1121,12 +1121,17 @@ sub robust_fit{
         }
 
         $total = $data_cnt;
-        medfit();
+	if($total > 0){
+        	medfit();
 
-        $alpha += $beta * (-1.0 * $xavg) + $yavg;
+        	$alpha += $beta * (-1.0 * $xavg) + $yavg;
 
-        $int   = $alpha;
-        $slope = $beta;
+        	$int   = $alpha;
+        	$slope = $beta;
+	}else{
+		$int   = 0;
+		$slope = 0;
+	}
 }
 
 
